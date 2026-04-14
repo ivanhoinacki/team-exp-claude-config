@@ -604,25 +604,16 @@ print_header "Phase 5: Hooks + Status Line"
 mkdir -p "$CLAUDE_HOME/.claude/hooks"
 HOOK_COUNT=0
 
-# Core hooks (5)
-for hook in pre-git-commit.sh session-start-check.sh skill-enforcement-guard.sh skill-tracker.sh tool-preference-guard.sh; do
-  if [ -f "$REPO_ROOT/hooks/core/$hook" ]; then
-    cp "$REPO_ROOT/hooks/core/$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
+# All hooks (22)
+for hook in "$REPO_ROOT/hooks/"*.sh; do
+  [ -f "$hook" ] || continue
+  hook_name=$(basename "$hook")
+  if [ "$hook_name" = "statusline-command.sh" ]; then
+    cp "$hook" "$CLAUDE_HOME/.claude/statusline-command.sh"
   else
-    print_warn "Hook not found in repo: hooks/core/$hook"
+    cp "$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
   fi
 done
-
-# Optional hooks (17)
-for hook in "$REPO_ROOT/hooks/optional/"*.sh; do
-  [ -f "$hook" ] || continue
-  cp "$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
-done
-
-# Status line
-if [ -f "$REPO_ROOT/hooks/core/statusline-command.sh" ]; then
-  cp "$REPO_ROOT/hooks/core/statusline-command.sh" "$CLAUDE_HOME/.claude/statusline-command.sh"
-fi
 chmod +x "$CLAUDE_HOME/.claude/hooks/"*.sh 2>/dev/null || true
 chmod +x "$CLAUDE_HOME/.claude/statusline-command.sh" 2>/dev/null || true
 print_ok "$HOOK_COUNT hooks + status line installed"

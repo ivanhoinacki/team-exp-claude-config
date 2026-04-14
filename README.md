@@ -88,23 +88,17 @@ team-exp-claude-config/
     researcher.md          #   Sonnet, read-only discovery
     implementer.md         #   Opus, code implementation
     reviewer.md            #   Opus, read-only review
-  hooks/
-    core/                  # 5 essential hooks (installed by default)
-      pre-git-commit.sh
-      skill-enforcement-guard.sh
-      tool-preference-guard.sh
-      skill-tracker.sh
-      session-start-check.sh
-      statusline-command.sh
-    optional/              # 17 advanced hooks (opt-in)
-      vault-rag-reminder.sh
-      vault-rag-tracker.sh
-      worktree-setup.sh
-      worktree-remove.sh
-      frontend-layout-guard.sh
-      user-prompt-context.sh
-      agent-lifecycle-log.sh
-      ...
+  hooks/                   # 22 lifecycle hooks (all installed)
+    pre-git-commit.sh
+    skill-enforcement-guard.sh
+    tool-preference-guard.sh
+    skill-tracker.sh
+    session-start-check.sh
+    statusline-command.sh
+    vault-rag-reminder.sh
+    frontend-layout-guard.sh
+    worktree-setup.sh
+    ...
   claude-md/               # 9 service dossiers (CLAUDE.md templates)
     svc-experiences.md
     svc-order.md

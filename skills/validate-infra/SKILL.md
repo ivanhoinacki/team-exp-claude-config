@@ -1,9 +1,16 @@
 ---
 name: validate-infra
 description: Validate infrastructure configuration consistency (env vars, Pulumi, config, schema). Use when adding env vars, changing Pulumi config, before deploy, or when the user says "validate infra", "check config", "valida infra", "env vars ok?", "check pulumi".
+model: haiku
 argument-hint: "[service name, e.g. svc-experiences]"
 compatibility: Requires git, le CLI (for Pulumi config access)
 allowed-tools: Bash(git *), Bash(GIT_EDITOR=true git *), Read, Grep, Glob, Edit, Task
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Validate Infrastructure, Config Consistency Check

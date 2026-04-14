@@ -1,5 +1,6 @@
 ---
 name: daily
+model: haiku
 description: Generate daily standup notes from git history, session memory, and Jira. Use when the user says "daily", "generate daily", "create daily", "standup", "stand-up", "what did I do today", "daily notes".
 argument-hint: [YYYY-MM-DD or "hoje"]
 allowed-tools: Bash(git *), Read, Write, Glob

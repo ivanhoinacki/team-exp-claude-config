@@ -1,8 +1,15 @@
 ---
 name: learn
 description: Capture a learning (bug, workaround, pattern, gotcha) and save to persistent memory. Use when the user says "learn", "save this", "remember this", "note this", "record this", "never forget this", or when a non-obvious bug fix, workaround, or integration pattern is discovered during development.
+model: haiku
 argument-hint: [what was learned]
 allowed-tools: Read, Write, Edit, Glob, Grep, Task
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Capture Learning

@@ -1,5 +1,6 @@
 ---
 name: create-pr
+model: haiku
 description: Create a pull request with comprehensive technical format and monitor CI pipeline. Use when the user says "create pr", "open pr", "send the pr", "make the pr".
 argument-hint: [ticket number, e.g. EXP-1234]
 compatibility: Requires gh (GitHub CLI), git, circleci CLI (for CI monitoring)

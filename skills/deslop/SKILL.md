@@ -1,7 +1,14 @@
 ---
 name: deslop
+model: opus
 description: Remove AI-generated code slop (verbose comments, unnecessary abstractions, dead code, inconsistent patterns) from the current branch. Use after implementation and before commit/PR, or when the user says "deslop", "clean up AI code", "remove slop", "clean the code", "clean this up", "too much AI noise". Do NOT use for general refactoring (that's manual work).
 allowed-tools: Bash(git *), Read, Grep, Glob, Edit
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Remove AI Code Slop

@@ -1,9 +1,16 @@
 ---
 name: debug-mode
+model: sonnet
 description: Hypothesis-driven debugging workflow that requires runtime evidence before making fixes. Spins up a local log server so browser code can POST structured logs to a file the AI reads directly. Use when the user says "debug", "debug mode", "help me debug", "find this bug", "why isn't this working", "what's wrong with", "it's broken", or when investigating a bug that needs runtime log evidence rather than guessing from static code analysis. Do NOT use for static code review (use /code-review) or for incident investigation across multiple sources (use /investigation-case).
 argument-hint: [bug description]
 compatibility: Requires node, lsof, curl, git, gh (GitHub CLI)
 allowed-tools: Bash(node *), Bash(kill *), Bash(lsof *), Bash(nohup *), Bash(curl *), Bash(git *), Bash(gh *), Read, Grep, Glob, Edit, mcp__claude_ai_Slack__slack_search_public_and_private, mcp__mcp-atlassian__confluence_search, mcp__mcp-atlassian__confluence_get_page
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Debug Mode

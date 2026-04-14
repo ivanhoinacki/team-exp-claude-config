@@ -1,7 +1,14 @@
 ---
 name: feature-dev
 description: Full feature development workflow with codebase discovery, knowledge base search, implementation plan, and guided coding. Use when the user says "feature", "new feature", "start development", "plan feature", "feature-dev", "implement", "build this feature", or pastes a Jira ticket description for implementation. Do NOT use for bug fixes (use /debug-mode or /investigation-case) or for code review (use /code-review).
+model: sonnet
 argument-hint: [EXP-XXXX or feature description]
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources for any LE-related task. This is enforced by hook. No exceptions.
+
 ---
 
 # Feature Development, Discovery, Plan & Implementation

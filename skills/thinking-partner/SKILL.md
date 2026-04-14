@@ -1,7 +1,14 @@
 ---
 name: thinking-partner
 description: Activate a self-critical, collaborative thinking mode. Use when the user says "thinking partner", "think together", "challenge me", "let's think", "think with me", or when the conversation needs deeper analysis rather than quick answers.
+model: haiku
 argument-hint: [topic or problem to think through]
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Thinking Partner Mode

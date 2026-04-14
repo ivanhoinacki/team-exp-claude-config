@@ -1,14 +1,18 @@
 ---
 name: investigation-case
+model: opus
 description: Deep forensic investigation of bugs, incidents, or reported problems. Sweeps all sources (Jira, Slack, GitHub, Confluence, Codebase, Datadog/NR), cross-references data, reconstructs timeline, identifies root cause, and produces Investigation Case with Fix Plan. Use when the user says "investigation", "investigate", "investigation-case", "analyze this bug", "deep dive", "root cause", "what happened", "why did this fail", or when a bug/incident requires cross-system evidence gathering before fixing.
 argument-hint: [ticket ID like BUG007-XXXX or EXP-XXXX, or problem description]
 compatibility: Requires gh (GitHub CLI), git, newrelic CLI (legacy services), mcp-atlassian (Jira/Confluence), Slack MCP, Datadog MCP
 context: fork
-model: sonnet
 allowed-tools: Bash(git *), Bash(gh *), Bash(newrelic *), Bash(wc *), Bash(ls *), Read, Write, Edit, Grep, Glob, Agent, mcp__claude_ai_Slack__slack_search_public_and_private, mcp__claude_ai_Slack__slack_read_channel, mcp__claude_ai_Slack__slack_read_thread, mcp__mcp-atlassian__jira_search, mcp__mcp-atlassian__jira_get_issue, mcp__mcp-atlassian__jira_get_issue_dates, mcp__mcp-atlassian__jira_get_issue_development_info, mcp__mcp-atlassian__confluence_search, mcp__mcp-atlassian__confluence_get_page
 ---
 
 # Investigation Case -- Deep Forensic Investigation
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE ANYTHING ELSE)
+
+Before ANY file reads, grep, or codebase exploration, call `query_vault` with relevant keywords and service_filter. This is non-negotiable and must be the FIRST action after reading the task. The vault contains pitfalls, business rules, review learnings, and patterns that prevent rework. Skip = rework.
 
 ## Purpose
 

@@ -1,5 +1,6 @@
 ---
 name: commit
+model: haiku
 description: Commit current work with a clean, conventional message. Use when the user says "commit", "save this", "git commit", "make the commit". Do NOT use for push (that requires separate approval).
 allowed-tools: Bash(git *)
 effort: low

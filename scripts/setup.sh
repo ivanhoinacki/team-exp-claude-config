@@ -637,7 +637,8 @@ if [ ! -f "$CLAUDE_HOME/.claude/settings.json" ]; then
   "hooks": {
     "PreToolUse": [
       {"matcher":"Bash","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-enforcement-guard.sh","timeout":5,"statusMessage":"Checking skill enforcement..."},{"type":"command","command":"$HOME/.claude/hooks/tool-preference-guard.sh","timeout":3}]},
-      {"matcher":"Bash(git commit)","hooks":[{"type":"command","command":"$HOME/.claude/hooks/pre-git-commit.sh","timeout":120,"statusMessage":"Running pre-commit checks (lint + types)..."}]}
+      {"matcher":"Bash(git commit)","hooks":[{"type":"command","command":"$HOME/.claude/hooks/pre-git-commit.sh","timeout":120,"statusMessage":"Running pre-commit checks (lint + types)..."}]},
+      {"matcher":"Agent","hooks":[{"type":"command","command":"$HOME/.claude/hooks/agent-model-guard.sh","timeout":3,"statusMessage":"Validating Agent model parameter..."}]}
     ],
     "PostToolUse": [{"matcher":"Skill","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-tracker.sh","timeout":3}]}],
     "SessionStart": [{"matcher":"startup|resume","hooks":[{"type":"command","command":"~/.claude/hooks/session-start-check.sh","timeout":10}]}],

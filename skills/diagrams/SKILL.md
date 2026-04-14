@@ -1,6 +1,7 @@
 ---
 name: diagrams
 description: Diagram standard. Use when creating diagrams, flowcharts, sequence diagrams, entity diagrams, or when the user mentions "diagram", "diagrama", "plantuml", "mermaid", "sequence", "flowchart", "entity diagram", "C4".
+model: haiku
 effort: low
 ---
 

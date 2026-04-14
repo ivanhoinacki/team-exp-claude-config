@@ -1,9 +1,15 @@
 ---
 name: deploy-checklist
+model: haiku
 description: Generate deployment checklist for a feature before merge. Use after PR is approved, before merge, or when the user says "deploy checklist", "checklist deploy", "pre-deploy", "ready to merge?", "checklist de deploy", "posso mergear?", "pronto pra deploy?", "can I merge?", "deploy readiness". Do NOT use for CI pipeline monitoring (use /create-pr for that).
 argument-hint: "[EXP-XXXX ticket number]"
-disable-model-invocation: true
 allowed-tools: Bash(git *), Bash(GIT_EDITOR=true git *), Read, Grep, Glob, Write, Edit, Task
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Deploy Checklist Generator

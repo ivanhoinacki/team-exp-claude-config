@@ -1,8 +1,15 @@
 ---
 name: validate-migration
 description: Validate database migration safety before merge. Checks rollback plan, backwards compatibility, performance impact, and lock duration. Use when creating migrations, altering tables, adding indexes, or when the user says "validate migration", "check migration", "migration safe?", "migration ok?", "can I run this migration?".
+model: haiku
 argument-hint: [migration-file-path]
 allowed-tools: Bash(git *), Bash(GIT_EDITOR=true git *), Read, Glob, Grep, Edit, Task
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Validate Migration

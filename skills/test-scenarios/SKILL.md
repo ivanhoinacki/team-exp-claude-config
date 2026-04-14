@@ -3,9 +3,16 @@ name: test-scenarios
 description: |
   Validate feature with real test scenarios before commit. Verifies environment (Docker, VPN, DB), seeds test data, runs unit + integration tests, and executes manual smoke tests against local or staging.
   Use after /code-review and before /commit. Use when the user says "test", "testar", "test scenarios", "smoke test", "integration test", "valida no staging", "roda os testes", "testa isso", "verifica se funciona", "run tests", or when the workflow reaches the test gate. Do NOT use for just running `yarn test` (that's a direct command).
+model: haiku
 argument-hint: [feature description or ticket number]
 compatibility: Requires docker, git, gh (GitHub CLI), yarn, node, psql (PostgreSQL client)
 allowed-tools: Bash(git *), Bash(gh *), Bash(docker *), Bash(curl *), Bash(yarn *), Bash(npx *), Bash(node *), Bash(psql *), Read, Write, Edit, Grep, Glob, Agent
+---
+
+## Phase 0: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+
+You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources. This is enforced by hook. No exceptions.
+
 ---
 
 # Test Scenarios -- Real Validation Before Commit

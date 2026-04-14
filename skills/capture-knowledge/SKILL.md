@@ -1,5 +1,6 @@
 ---
 name: capture-knowledge
+model: haiku
 description: |
   Capture business knowledge from Slack into the Knowledge Base. Two modes:
   (1) Single thread: pass a Slack URL to capture one discussion
@@ -12,6 +13,11 @@ allowed-tools: Bash(git *), Read, Write, Edit, Grep, Glob, Agent, mcp__claude_ai
 ---
 
 # Capture Knowledge from Discussions
+
+## Phase 0: Vault RAG (MANDATORY)
+
+Before ANY file reads, grep, or codebase exploration, call `query_vault` with relevant keywords and service_filter. This is non-negotiable. The vault contains pitfalls, business rules, review learnings, and patterns that prevent rework. Skip = rework.
+
 
 Extract business rules, technical flows, and domain knowledge from Slack. Save as structured knowledge that informs future development decisions.
 

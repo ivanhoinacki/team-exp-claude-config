@@ -508,7 +508,7 @@ for skill_dir in "$REPO_ROOT/skills/"*/; do
     rm -f "$LEARNINGS_BAK"
   fi
 
-  SKILL_COUNT=$((SKILL_COUNT + 1))
+  [ -f "$target/SKILL.md" ] && SKILL_COUNT=$((SKILL_COUNT + 1))
 done
 print_ok "$SKILL_COUNT skills installed"
 phase_ok "4-skills"
@@ -833,6 +833,7 @@ if [ "$USE_CURSOR" = "y" ] || [ "$USE_CURSOR" = "Y" ]; then
   mkdir -p "$CLAUDE_HOME/.cursor/rules"
   CURSOR_RULE_COUNT=0
   for f in "$CLAUDE_HOME/.claude/rules/"*.md; do
+    [ "$(basename "$f")" = "README.md" ] && continue
     cp "$f" "$CLAUDE_HOME/.cursor/rules/$(basename "$f" .md).mdc" 2>/dev/null && CURSOR_RULE_COUNT=$((CURSOR_RULE_COUNT + 1))
   done
   EXTRA_RULES=$(ls "$CLAUDE_HOME/.cursor/rules/"*.mdc 2>/dev/null | wc -l | tr -d ' ')

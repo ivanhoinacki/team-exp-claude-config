@@ -73,24 +73,7 @@ if cmd_matches '\bgh\s+pr\s+create\b'; then
   fi
 fi
 
-# Check: git push - allow in worktrees, block on main checkouts
-if cmd_matches '\bgit\s+push\b'; then
-  # Detect if command targets a worktree (path contains "--" pattern like repo--feature)
-  is_worktree=false
-  if echo "$command" | grep -qE 'cd\s+[^\s]*--[^\s]*'; then
-    is_worktree=true
-  fi
-  if [ "$is_worktree" = false ]; then
-    jq -n '{
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "deny",
-        permissionDecisionReason: "ESCALATION: git push on main checkout requires explicit user approval. Ask the user before pushing. (Hint: pushes from worktree directories like repo--feature are allowed automatically.)"
-      }
-    }'
-    exit 0
-  fi
-fi
+# git push: allowed (no escalation)
 
 # Check: destructive commands
 if cmd_matches '\bgit\s+reset\s+--hard\b|\brm\s+-rf\b|\bgit\s+clean\s+-f'; then

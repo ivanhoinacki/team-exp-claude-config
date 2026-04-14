@@ -74,10 +74,10 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
 done
 
 # --- Hooks ---
-header "5. Hooks (expect 5 scripts + statusline)"
+header "5. Hooks (expect 22 scripts + statusline)"
 
 HOOKS_DIR="$HOME/.claude/hooks"
-EXPECTED_HOOKS=("pre-git-commit.sh" "session-start-check.sh" "skill-enforcement-guard.sh" "skill-tracker.sh" "tool-preference-guard.sh")
+EXPECTED_HOOKS=("pre-git-commit.sh" "session-start-check.sh" "skill-enforcement-guard.sh" "skill-tracker.sh" "tool-preference-guard.sh" "agent-lifecycle-log.sh" "config-change-log.sh" "cwd-context.sh" "elicitation-log.sh" "file-changed-log.sh" "frontend-layout-guard.sh" "instructions-audit.sh" "permission-denied-handler.sh" "post-tool-failure-log.sh" "postcompact-log.sh" "precompact-backup.sh" "stop-failure-handler.sh" "user-prompt-context.sh" "vault-rag-reminder.sh" "vault-rag-tracker.sh" "worktree-remove.sh" "worktree-setup.sh")
 
 for hook in "${EXPECTED_HOOKS[@]}"; do
   if [ -f "$HOOKS_DIR/$hook" ] && [ -x "$HOOKS_DIR/$hook" ]; then

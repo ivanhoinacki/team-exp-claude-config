@@ -21,7 +21,7 @@ curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/
 | **Rules** | 8 | Behavioral guardrails (auto-loaded every conversation) |
 | **Skills** | 16 | Automated workflows: `/commit`, `/create-pr`, `/feature-dev`, `/investigation-case`, etc. |
 | **Agents** | 4 | Specialized sub-agents: Copilot, Researcher, Implementer, Reviewer |
-| **Hooks** | 5 core + 17 optional | Lifecycle automation: pre-commit checks, skill enforcement, tool preferences |
+| **Hooks** | 22 | Lifecycle automation: pre-commit checks, skill enforcement, tool preferences, context, logging |
 | **Service Dossiers** | 9 | CLAUDE.md per repo (stack, commands, patterns, gotchas) |
 | **MCP Servers** | 8 | Atlassian, Datadog, ChromaDB/vault-rag, Context7, Probe, Playwright, Chrome DevTools, Imugi |
 | **Status Line** | 1 | `user :: dir :: branch :: rate% :: ctx%` |

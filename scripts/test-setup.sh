@@ -250,17 +250,22 @@ header "Hooks"
 HOOKS_DIR="$TEST_HOME/.claude/hooks"
 assert_dir "$HOOKS_DIR" "hooks directory exists"
 
-EXPECTED_HOOKS=("pre-git-commit.sh" "session-start-check.sh" "skill-enforcement-guard.sh" "skill-tracker.sh" "tool-preference-guard.sh")
-for hook in "${EXPECTED_HOOKS[@]}"; do
+EXPECTED_CORE_HOOKS=("pre-git-commit.sh" "session-start-check.sh" "skill-enforcement-guard.sh" "skill-tracker.sh" "tool-preference-guard.sh")
+for hook in "${EXPECTED_CORE_HOOKS[@]}"; do
   assert_file "$HOOKS_DIR/$hook" "hook: $hook"
   assert_exec "$HOOKS_DIR/$hook" "hook executable: $hook"
+done
+
+EXPECTED_OPTIONAL_HOOKS=("agent-lifecycle-log.sh" "config-change-log.sh" "cwd-context.sh" "elicitation-log.sh" "file-changed-log.sh" "frontend-layout-guard.sh" "instructions-audit.sh" "permission-denied-handler.sh" "post-tool-failure-log.sh" "postcompact-log.sh" "precompact-backup.sh" "stop-failure-handler.sh" "user-prompt-context.sh" "vault-rag-reminder.sh" "vault-rag-tracker.sh" "worktree-remove.sh" "worktree-setup.sh")
+for hook in "${EXPECTED_OPTIONAL_HOOKS[@]}"; do
+  assert_file "$HOOKS_DIR/$hook" "hook: $hook"
 done
 
 assert_file "$TEST_HOME/.claude/statusline-command.sh" "statusline-command.sh installed"
 assert_exec "$TEST_HOME/.claude/statusline-command.sh" "statusline-command.sh executable"
 
 HOOK_COUNT=$(ls "$HOOKS_DIR/"*.sh 2>/dev/null | wc -l | tr -d ' ')
-assert_count "$HOOK_COUNT" 5 "total hook scripts"
+assert_count "$HOOK_COUNT" 22 "total hook scripts"
 
 # ============================================================================
 # Test 6: Settings

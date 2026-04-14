@@ -591,6 +591,8 @@ phase_ok "5.6-dossiers"
 print_header "Phase 6: Hooks + Status Line"
 mkdir -p "$CLAUDE_HOME/.claude/hooks"
 HOOK_COUNT=0
+
+# Core hooks (5)
 for hook in pre-git-commit.sh session-start-check.sh skill-enforcement-guard.sh skill-tracker.sh tool-preference-guard.sh; do
   if [ -f "$REPO_ROOT/hooks/core/$hook" ]; then
     cp "$REPO_ROOT/hooks/core/$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
@@ -598,6 +600,14 @@ for hook in pre-git-commit.sh session-start-check.sh skill-enforcement-guard.sh 
     print_warn "Hook not found: hooks/core/$hook"
   fi
 done
+
+# Optional hooks (17)
+for hook in "$REPO_ROOT/hooks/optional/"*.sh; do
+  [ -f "$hook" ] || continue
+  cp "$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
+done
+
+# Status line
 if [ -f "$REPO_ROOT/hooks/core/statusline-command.sh" ]; then
   cp "$REPO_ROOT/hooks/core/statusline-command.sh" "$CLAUDE_HOME/.claude/statusline-command.sh"
 fi
@@ -1183,7 +1193,7 @@ Run a full setup verification. Check each item and report a table with status (P
 1. **Rules**: list files in ~/.claude/rules/, confirm 8 .md files exist and none contain __PLACEHOLDER__ strings
 2. **Skills**: list dirs in ~/.claude/skills/, confirm each has a SKILL.md, count total
 3. **Agents**: list files in ~/.claude/agents/, confirm 4 .md files, none contain __PLACEHOLDER__ strings
-4. **Hooks**: list files in ~/.claude/hooks/, confirm 5 .sh files are executable, confirm ~/.claude/statusline-command.sh exists
+4. **Hooks**: list files in ~/.claude/hooks/, confirm 22 .sh files are executable, confirm ~/.claude/statusline-command.sh exists
 5. **Settings**: read ~/.claude/settings.json, confirm valid JSON with keys: hooks, statusLine, permissions, env
 6. **MCP Servers**: read ~/.claude.json, confirm mcpServers has at minimum: mcp-atlassian, datadog-mcp, context7, probe, playwright, chrome-devtools, imugi (7 base). If local-le-chromadb exists (Local AI enabled), check the python and script paths exist on disk. Report total count
 7. **Placeholders**: grep recursively in ~/.claude/rules/, ~/.claude/skills/, ~/.claude/agents/ for any remaining __PLACEHOLDER__ patterns (double underscore prefix+suffix). Report any found

@@ -6,7 +6,7 @@ compatibility: Requires git, le CLI (for Pulumi config access)
 allowed-tools: Bash(git *), Bash(GIT_EDITOR=true git *), Read, Grep, Glob, Edit, Task
 ---
 
-# Validate Infrastructure — Config Consistency Check
+# Validate Infrastructure, Config Consistency Check
 
 ## Working Directories
 
@@ -79,8 +79,8 @@ If multiple services are detected, validate ALL of them (see Phase 2 multi-servi
 If the service is not in this map, discover paths by searching:
 
 Use native tools to discover paths:
-- **Config files**: Glob tool — patterns `**/environment-variables*`, `**/schema.ts`, `**/config.ts` in service root (automatically excludes node_modules)
-- **Pulumi files**: Glob tool — pattern `**/Pulumi.*.yaml` in service root
+- **Config files**: Glob tool, patterns `**/environment-variables*`, `**/schema.ts`, `**/config.ts` in service root (automatically excludes node_modules)
+- **Pulumi files**: Glob tool, pattern `**/Pulumi.*.yaml` in service root
 
 ---
 
@@ -121,7 +121,7 @@ For service [name] in __CODEBASE_ROOT__/[service]:
 1. Read infra/[svc-name]/Pulumi.staging.yaml and Pulumi.prod.yaml
 2. Extract ALL keys from envVars: section (both staging and prod)
 3. Extract ALL keys from secretNames: section
-4. Check for secure: entries — these are set via `le pulumi config set --secret`
+4. Check for secure: entries, these are set via `le pulumi config set --secret`
 5. For each key in secretNames, verify a corresponding secure: entry exists
 6. Note: only staging and prod stacks exist (no dev)
 
@@ -174,7 +174,7 @@ SECRET_KEY           | secret:ok  | secret:MISS | secretNames | ok     | ok     
 
 For each env var, check:
 
-1. **Present in ALL 4 layers** — if missing from any, it's a failure
+1. **Present in ALL 4 layers**, if missing from any, it's a failure
 2. **Pulumi values match expectations**:
    - Staging and prod both have the key (or it's intentionally staging-only)
    - Values are appropriate (prod shouldn't have localhost, staging shouldn't have prod URLs)
@@ -327,7 +327,7 @@ Re-run /validate-infra after fixing.
 If multiple services were validated:
 
 ```
-Infrastructure validation — 2 services
+Infrastructure validation, 2 services
 
   svc-experiences: PASSED (12 vars, 3 secrets, all consistent)
   svc-order:       FAILED (8 vars, 1 missing from Pulumi.prod)

@@ -1,10 +1,10 @@
-# Code Review: 18 Dimensions — Detailed Reference
+# Code Review: 18 Dimensions, Detailed Reference
 
 > Parent skill: [`code-review/SKILL.md`](../SKILL.md)
 
 Each dimension has findings that map to a tier based on severity.
 
-## Critical dimensions (Tier 1 — blocks merge)
+## Critical dimensions (Tier 1, blocks merge)
 
 ### D1. Correctness
 
@@ -34,7 +34,7 @@ Each dimension has findings that map to a tier based on severity.
 - **Tier 2**: Missing retry/backoff on flaky external calls, error messages that don't help debugging
 - **LE examples**: `JSON.parse` on external data without try-catch: one bad row breaks entire batch (PR #1743, #1707). Forgotten `await` on async call: promise floats, errors unhandled. `axios.get(url)` without `timeout` hangs forever. Missing `process.exit()` in ECS scripts keeps event loop alive (PR #5390). Sequelize queries inside `transaction()` without passing `{ transaction: t }` run outside the transaction (rollback has no effect)
 
-## High dimensions (Tier 2 — should fix before merge)
+## High dimensions (Tier 2, should fix before merge)
 
 ### D5. SOLID / Clean Code
 
@@ -60,7 +60,7 @@ Each dimension has findings that map to a tier based on severity.
 - **Tier 1**: Circular dependency introduced, data layer calling presentation layer
 - **Tier 2**: Layer violation (e.g., controller with business logic), unclear module boundaries
 
-## Medium dimensions (Tier 2/3 — fix if possible)
+## Medium dimensions (Tier 2/3, fix if possible)
 
 ### D9. Operational Readiness
 
@@ -88,7 +88,7 @@ Each dimension has findings that map to a tier based on severity.
 - **Tier 2**: Unpinned version (^major), unnecessary new dependency (existing dep covers it), incompatible license
 - **Tier 3**: Could use lighter alternative
 
-## LE-Specific dimensions (Tier 1/2 — derived from real incidents)
+## LE-Specific dimensions (Tier 1/2, derived from real incidents)
 
 ### D13. Cross-Service Contract Integrity
 

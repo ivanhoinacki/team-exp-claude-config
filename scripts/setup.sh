@@ -470,7 +470,7 @@ phase_ok "backup"
 print_header "Phase 2: Rules"
 mkdir -p "$CLAUDE_HOME/.claude/rules"
 cp "$REPO_ROOT/rules/"*.md "$CLAUDE_HOME/.claude/rules/" || phase_fail "2" "Failed to copy rules"
-RULE_COUNT=$(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | wc -l | tr -d ' ')
+RULE_COUNT=$(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ')
 print_ok "$RULE_COUNT rules installed"
 phase_ok "2-rules"
 
@@ -528,7 +528,7 @@ phase_ok "3-skills"
 print_header "Phase 4: Agents"
 mkdir -p "$CLAUDE_HOME/.claude/agents"
 cp "$REPO_ROOT/agents/"*.md "$CLAUDE_HOME/.claude/agents/" || phase_fail "4" "Failed to copy agents"
-AGENT_COUNT=$(ls "$CLAUDE_HOME/.claude/agents/"*.md 2>/dev/null | wc -l | tr -d ' ')
+AGENT_COUNT=$(ls "$CLAUDE_HOME/.claude/agents/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ')
 print_ok "$AGENT_COUNT agents installed"
 phase_ok "4-agents"
 
@@ -1123,7 +1123,7 @@ fi
 
 echo -e "${GREEN}${BOLD}Installed:${NC}"
 MCP_COUNT=$(python3 -c "import json; print(len(json.load(open('$CLAUDE_HOME/.claude.json')).get('mcpServers',{})))" 2>/dev/null || echo "?")
-echo "  $(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | wc -l | tr -d ' ') rules | $(ls -d "$CLAUDE_HOME/.claude/skills/"*/ 2>/dev/null | wc -l | tr -d ' ') skills | $(ls "$CLAUDE_HOME/.claude/agents/"*.md 2>/dev/null | wc -l | tr -d ' ') agents | $MCP_COUNT MCP servers"
+echo "  $(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ') rules | $(ls -d "$CLAUDE_HOME/.claude/skills/"*/ 2>/dev/null | wc -l | tr -d ' ') skills | $(ls "$CLAUDE_HOME/.claude/agents/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ') agents | $MCP_COUNT MCP servers"
 if [ -d "$CLAUDE_HOME/.claude/local-ai/vault" ]; then
   echo "  Vault RAG: scripts installed | $([ -d "$CHROMA_DIR/venv" ] && echo 'venv ready' || echo 'venv missing')"
 fi

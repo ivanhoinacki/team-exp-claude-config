@@ -31,10 +31,10 @@ Local development infrastructure orchestrator. Docker Compose services (Postgres
 ## Knowledge Base & Tools (check BEFORE coding)
 **MANDATORY**: Call `query_vault` BEFORE reading code, attempting fixes, or starting any investigation.
 
-- **Vault RAG (ALWAYS FIRST)**: `query_vault(query="<keywords>", service_filter="infra-le-local-dev")` — pitfalls, review-learnings, business rules, runbooks indexed from the team vault
-- **Slack**: `slack_search_public_and_private(query="<error or topic>")` — past team discussions, incident threads
-- **Confluence**: `confluence_search(query="docker local dev setup")` — internal docs, runbooks
-- **GitHub**: `gh pr list --search "<query>" --repo user/repo` via Bash — past PRs, review discussions
+- **Vault RAG (ALWAYS FIRST)**: `query_vault(query="<keywords>", service_filter="infra-le-local-dev")`, pitfalls, review-learnings, business rules, runbooks indexed from the team vault
+- **Slack**: `slack_search_public_and_private(query="<error or topic>")`, past team discussions, incident threads
+- **Confluence**: `confluence_search(query="docker local dev setup")`, internal docs, runbooks
+- **GitHub**: `gh pr list --search "<query>" --repo user/repo` via Bash, past PRs, review discussions
 
 ## Pitfalls
 - Mac/Windows users: LOCALHOST must be host.docker.internal (not localhost)

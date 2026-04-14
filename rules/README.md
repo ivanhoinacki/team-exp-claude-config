@@ -8,7 +8,7 @@ Behavioral guardrails that Claude loads automatically at the start of every conv
 |---|---|
 | `00-global-style.md` | Language, tone, formatting, commit style, technical posture |
 | `01-code-quality-review.md` | 18-dimension code quality checklist (correctness, security, performance, etc.) |
-| `02-skills-first.md` | Skill routing — ensures Claude uses skills instead of raw commands |
+| `02-skills-first.md` | Skill routing, ensures Claude uses skills instead of raw commands |
 | `03-escalation-protocol.md` | What requires user approval vs. what Claude can do autonomously |
 | `04-study-before-starting.md` | Mandatory discovery phase before any development task |
 | `05-diagrams-standard.md` | PlantUML for Obsidian, Mermaid for GitHub PRs |

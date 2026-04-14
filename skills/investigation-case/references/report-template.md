@@ -97,7 +97,7 @@ severity: { P1/P2/P3 }
 
 - **Affected customers**: {count or estimate}
 - **Affected orders**: {count or IDs}
-- **Severity**: {P1/P2/P3} — {justification}
+- **Severity**: {P1/P2/P3}, {justification}
 - **Blast radius**: {scope}
 - **Trend**: {increasing/stable/decreasing}
 - **Has workaround**: {yes/no}

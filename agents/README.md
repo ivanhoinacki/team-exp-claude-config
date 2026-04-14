@@ -6,10 +6,10 @@ Specialized sub-agents for Claude Code. Each agent has a defined role, model pre
 
 | Agent | Model | Mode | Purpose |
 |---|---|---|---|
-| `copilot.md` | Opus | Read/Write | Daily partner — context-aware, triggers skills, updates session memory |
-| `researcher.md` | Sonnet | Read-only | Discovery and investigation — searches codebase, docs, Slack, Jira |
-| `implementer.md` | Opus | Read/Write | Code implementation — follows approved plans, writes code and tests |
-| `reviewer.md` | Opus | Read-only | Code review — 18-dimension analysis, posts inline PR comments |
+| `copilot.md` | Opus | Read/Write | Daily partner, context-aware, triggers skills, updates session memory |
+| `researcher.md` | Sonnet | Read-only | Discovery and investigation, searches codebase, docs, Slack, Jira |
+| `implementer.md` | Opus | Read/Write | Code implementation, follows approved plans, writes code and tests |
+| `reviewer.md` | Opus | Read-only | Code review, 18-dimension analysis, posts inline PR comments |
 
 ## How agents work
 

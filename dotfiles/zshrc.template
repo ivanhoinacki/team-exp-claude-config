@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 # =============================================================================
-# Luxury Escapes Engineering — .zshrc template
+# Luxury Escapes Engineering, .zshrc template
 # Includes: oh-my-zsh, Spaceship, Zinit, modern CLI tools, dev helper functions
 # =============================================================================
 

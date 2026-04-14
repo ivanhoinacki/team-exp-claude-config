@@ -25,7 +25,7 @@ Scan the context thoroughly before acting. Every situation is different.
 ```
 # Category 1
 - [ ] Item: `command to run or check`
-- [ ] Item: Grep tool — pattern `"pattern"` in `src/`
+- [ ] Item: Grep tool, pattern `"pattern"` in `src/`
 
 # Category 2
 - [ ] Item: `command or check`

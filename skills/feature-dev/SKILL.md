@@ -4,7 +4,7 @@ description: Full feature development workflow with codebase discovery, knowledg
 argument-hint: [EXP-XXXX or feature description]
 ---
 
-# Feature Development — Discovery, Plan & Implementation
+# Feature Development, Discovery, Plan & Implementation
 
 ## Working Directories
 
@@ -59,7 +59,7 @@ Once the user approves the plan, proceed autonomously through all development st
 
 ### REQUIRES explicit permission (stop and ask)
 
-- `git commit` — ALWAYS ask before committing
+- `git commit`, ALWAYS ask before committing
 - `git push` to remote
 - Opening a PR (`gh pr create`)
 - Sending Slack messages (reading/searching is auto-approved)
@@ -102,15 +102,15 @@ Search the company knowledge base BEFORE any planning. Full checklist in [refere
 
 **Required searches (in order):**
 
-1. **LE Vault RAG (MCP `local-le-chromadb`) — FIRST** — Semantic search on indexed LE knowledge (Chroma collection `le-vault`). Call `query_vault` with feature/ticket keywords, domain terms, and `service_filter` when the target service is known (e.g. `svc-experiences`, `www-le-customer`). Use `list_vault_sources` if you need available `type_filter` / service names. Absorb review learnings, business-rule snippets, runbooks, and pitfalls from results before deeper file reads.
-2. **Service chain & terminology** — read `Runbooks/Experiences-Ecosystem.md` and `Runbooks/Luxury-Escapes-Ecosystem.md`. Identify ALL services in the data flow. Build alias list (e.g., "LED" = "Lux Everyday" = "svc-ee-offer" = "Salesforce Connect")
-3. **Business Rules** — check `Knowledge-Base/Business-Rules/` for the domain. Match task to files: booking/checkout -> `Checkout.md` + `Providers.md`, refunds -> `Refunds.md` + `Orders.md`, promos -> `Promos.md`, search -> `Search.md`, white label -> `WhiteLabel.md`, ops -> `Operations.md`. Read the full file. For each rule found, evaluate: does this affect what I'm building? Am I about to violate a known constraint?
-4. **pitfalls.md** — read and check relevant domain sections. 66+ gotchas that prevent known bugs
-5. **Local KB mirror** — search Confluence mirror with Grep tool: pattern `TERM`, path `__VAULT_ROOT__/Knowledge-Base/Confluence/`
-6. **Confluence via MCP** — minimum 3 queries across Tier 1 spaces (PE, TEC, ENGX), read full pages
-7. **Slack** — minimum 2 keyword queries using ALL terminology aliases across team channels, read full threads
-8. **GitHub PRs** — `gh pr list --repo lux-group/REPO --search "KEYWORD" --state merged --limit 5`, read PR bodies for rationale and trade-offs
-9. **Git history** — `git log --oneline --all -15 -- path/to/changed/area`
+1. **LE Vault RAG (MCP `local-le-chromadb`), FIRST**, Semantic search on indexed LE knowledge (Chroma collection `le-vault`). Call `query_vault` with feature/ticket keywords, domain terms, and `service_filter` when the target service is known (e.g. `svc-experiences`, `www-le-customer`). Use `list_vault_sources` if you need available `type_filter` / service names. Absorb review learnings, business-rule snippets, runbooks, and pitfalls from results before deeper file reads.
+2. **Service chain & terminology**, read `Runbooks/Experiences-Ecosystem.md` and `Runbooks/Luxury-Escapes-Ecosystem.md`. Identify ALL services in the data flow. Build alias list (e.g., "LED" = "Lux Everyday" = "svc-ee-offer" = "Salesforce Connect")
+3. **Business Rules**, check `Knowledge-Base/Business-Rules/` for the domain. Match task to files: booking/checkout -> `Checkout.md` + `Providers.md`, refunds -> `Refunds.md` + `Orders.md`, promos -> `Promos.md`, search -> `Search.md`, white label -> `WhiteLabel.md`, ops -> `Operations.md`. Read the full file. For each rule found, evaluate: does this affect what I'm building? Am I about to violate a known constraint?
+4. **pitfalls.md**, read and check relevant domain sections. 66+ gotchas that prevent known bugs
+5. **Local KB mirror**, search Confluence mirror with Grep tool: pattern `TERM`, path `__VAULT_ROOT__/Knowledge-Base/Confluence/`
+6. **Confluence via MCP**, minimum 3 queries across Tier 1 spaces (PE, TEC, ENGX), read full pages
+7. **Slack**, minimum 2 keyword queries using ALL terminology aliases across team channels, read full threads
+8. **GitHub PRs**, `gh pr list --repo lux-group/REPO --search "KEYWORD" --state merged --limit 5`, read PR bodies for rationale and trade-offs
+9. **Git history**, `git log --oneline --all -15 -- path/to/changed/area`
 
 **Output:** list relevant docs found, context extracted, gaps to investigate.
 
@@ -121,12 +121,12 @@ Analyze the actual codebase to understand existing patterns. Full checklist in [
 **Required analysis (per target service):**
 
 1. **Project structure**: Bash `ls ~/Documents/LuxuryEscapes/SERVICE/src/`
-2. **Similar features**: Grep tool — pattern `DOMAIN_TERM`, path `~/Documents/LuxuryEscapes/SERVICE/src/`, glob `*.ts`
-3. **Test patterns**: Glob tool — pattern `**/*.test.ts` in the feature area, then Read 1-2 files
-4. **Validation patterns**: Grep tool — pattern `joi|zod|strummer|schema`, path `SERVICE/src/`, output `files_with_matches`, head_limit 5
-5. **Error handling**: Grep tool — pattern `throw|AppError|HttpError|createError`, path `SERVICE/src/`, glob `*.ts`, output `files_with_matches`, head_limit 5
-6. **Config patterns**: Glob tool — pattern `**/config*` and `**/schema.ts` in `SERVICE/src/`
-7. **Existing enums/types**: Grep tool — pattern `export enum|export type|export interface`, path `SERVICE/src/models/`, glob `*.ts`, head_limit 10 (NEVER hardcode values that already exist as enums)
+2. **Similar features**: Grep tool, pattern `DOMAIN_TERM`, path `~/Documents/LuxuryEscapes/SERVICE/src/`, glob `*.ts`
+3. **Test patterns**: Glob tool, pattern `**/*.test.ts` in the feature area, then Read 1-2 files
+4. **Validation patterns**: Grep tool, pattern `joi|zod|strummer|schema`, path `SERVICE/src/`, output `files_with_matches`, head_limit 5
+5. **Error handling**: Grep tool, pattern `throw|AppError|HttpError|createError`, path `SERVICE/src/`, glob `*.ts`, output `files_with_matches`, head_limit 5
+6. **Config patterns**: Glob tool, pattern `**/config*` and `**/schema.ts` in `SERVICE/src/`
+7. **Existing enums/types**: Grep tool, pattern `export enum|export type|export interface`, path `SERVICE/src/models/`, glob `*.ts`, head_limit 10 (NEVER hardcode values that already exist as enums)
 8. **Existing utils**: Bash `ls ~/Documents/LuxuryEscapes/SERVICE/src/utils/ 2>/dev/null` (reuse before creating new)
 
 **Service-specific architecture patterns:**
@@ -395,7 +395,7 @@ Execute the guide autonomously. Follow the step-by-step order. For each step:
    yarn test --changedSince=main
    ```
 5. Fix any failures before moving to next step
-6. **Layout validation** (when implementing frontend/visual changes) — if the feature touches CSS, styled-components, JSX layout, LuxKit/MUI components, or responsive behavior, validate visually BEFORE presenting to user:
+6. **Layout validation** (when implementing frontend/visual changes), if the feature touches CSS, styled-components, JSX layout, LuxKit/MUI components, or responsive behavior, validate visually BEFORE presenting to user:
 
    **Step A: Screenshot verification (Playwright MCP)**
    ```
@@ -425,7 +425,7 @@ Execute the guide autonomously. Follow the step-by-step order. For each step:
 
    **Skip layout validation when**: backend-only changes, logic-only changes inside components (no JSX/style), test-only files, or dev server cannot start.
 
-7. **Deslop before presenting** — before showing code to the user or committing, self-review every file touched and remove:
+7. **Deslop before presenting**, before showing code to the user or committing, self-review every file touched and remove:
    - Comments a human wouldn't write or that are inconsistent with the rest of the file
    - Unnecessary defensive try/catch blocks (especially on trusted/validated codepaths)
    - Casts to `any` to work around type issues, fix the types instead
@@ -496,10 +496,10 @@ After implementation is complete:
 
    ```
    Implementation complete. Suggested next steps:
-   1. /deslop — clean AI code slop
-   2. /code-review — quality check (18 dimensions)
-   3. /commit — commit with proper format
-   4. /create-pr EXP-XXXX — open PR with full template
+   1. /deslop, clean AI code slop
+   2. /code-review, quality check (18 dimensions)
+   3. /commit, commit with proper format
+   4. /create-pr EXP-XXXX, open PR with full template
 
    Or tell me what to adjust.
    ```

@@ -251,9 +251,9 @@ After debug is complete, suggest next steps (invoke each via Skill tool, never r
 
 ```
 Debug complete. Suggested next steps:
-1. /learn — capture root cause as persistent learning
-2. /deslop — clean any debug artifacts
-3. /code-review — quality check (18 dimensions, branch mode)
-4. /commit — commit with proper format
-5. /create-pr — open PR with full template
+1. /learn, capture root cause as persistent learning
+2. /deslop, clean any debug artifacts
+3. /code-review, quality check (18 dimensions, branch mode)
+4. /commit, commit with proper format
+5. /create-pr, open PR with full template
 ```

@@ -181,7 +181,7 @@ for rule in "${EXPECTED_RULES[@]}"; do
   assert_file "$RULES_DIR/$rule" "rule: $rule"
 done
 
-RULE_COUNT=$(ls "$RULES_DIR/"*.md 2>/dev/null | wc -l | tr -d ' ')
+RULE_COUNT=$(ls "$RULES_DIR/"*.md 2>/dev/null | grep -v "README.md" | wc -l | tr -d ' ')
 assert_count "$RULE_COUNT" 8 "total rules"
 
 for rule in "${EXPECTED_RULES[@]}"; do
@@ -239,7 +239,7 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
   assert_file "$AGENTS_DIR/$agent" "agent: $agent"
 done
 
-AGENT_COUNT=$(ls "$AGENTS_DIR/"*.md 2>/dev/null | wc -l | tr -d ' ')
+AGENT_COUNT=$(ls "$AGENTS_DIR/"*.md 2>/dev/null | grep -v "README.md" | wc -l | tr -d ' ')
 assert_count "$AGENT_COUNT" 4 "total agents"
 
 # ============================================================================

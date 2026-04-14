@@ -33,13 +33,13 @@
 ## Knowledge Base & Tools (check BEFORE coding)
 **MANDATORY**: Call `query_vault` BEFORE reading code, attempting fixes, or starting any investigation.
 
-- **Vault RAG (ALWAYS FIRST)**: `query_vault(query="<keywords>", service_filter="svc-search")` — pitfalls, review-learnings, business rules, runbooks indexed from the team vault
-- **Ext. library docs**: Context7 MCP — `resolve-library-id("sequelize")` then `query-docs` for up-to-date API docs
-- **Slack**: `slack_search_public_and_private(query="<error or topic>")` — past team discussions, incident threads
-- **Jira**: `jira_get_issue(issue_key="EXP-XXXX")` — ticket context, acceptance criteria, linked issues
-- **Confluence**: `confluence_search(query="<topic>")` — internal docs, architecture, runbooks
-- **Datadog**: `search_datadog_logs(query="service:svc-search-main <error>")` — prod logs, traces (use `svc-search-{app}-{task}` for tasks)
-- **GitHub**: `gh pr list --search "<query>" --repo user/repo` via Bash — past PRs, review discussions
+- **Vault RAG (ALWAYS FIRST)**: `query_vault(query="<keywords>", service_filter="svc-search")`, pitfalls, review-learnings, business rules, runbooks indexed from the team vault
+- **Ext. library docs**: Context7 MCP, `resolve-library-id("sequelize")` then `query-docs` for up-to-date API docs
+- **Slack**: `slack_search_public_and_private(query="<error or topic>")`, past team discussions, incident threads
+- **Jira**: `jira_get_issue(issue_key="EXP-XXXX")`, ticket context, acceptance criteria, linked issues
+- **Confluence**: `confluence_search(query="<topic>")`, internal docs, architecture, runbooks
+- **Datadog**: `search_datadog_logs(query="service:svc-search-main <error>")`, prod logs, traces (use `svc-search-{app}-{task}` for tasks)
+- **GitHub**: `gh pr list --search "<query>" --repo user/repo` via Bash, past PRs, review discussions
 
 ## Business Rules
 - Search team owns deploy approval. Coordinate before merging

@@ -50,6 +50,6 @@ Skills are designed to chain in sequence:
 ## Creating new skills
 
 Use `templates/SKILL-TEMPLATE.md` as a starting point. Each skill needs:
-1. `SKILL.md` — instructions, phases, verification checklist
-2. `evals/` — at least one test scenario
-3. Optional `references/` — supporting docs
+1. `SKILL.md`, instructions, phases, verification checklist
+2. `evals/`, at least one test scenario
+3. Optional `references/`, supporting docs

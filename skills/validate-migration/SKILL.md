@@ -61,8 +61,8 @@ Check if the service uses special PostgreSQL features:
 
 svc-experiences has TWO databases that need migrations:
 
-- `svc_experiences_development` (port 5432) — dev database
-- `svc_experiences_spec` (port 5432, APP_ENV=spec) — test database
+- `svc_experiences_development` (port 5432), dev database
+- `svc_experiences_spec` (port 5432, APP_ENV=spec), test database
 
 Both must be migrated before tests will pass.
 
@@ -243,7 +243,7 @@ IRREVERSIBLE: This migration transforms data in [table].[column].
 
 - Service: [name]
 - ORM: [TypeORM/Sequelize/Prisma]
-- Dual DB: [yes/no — if svc-experiences, remind to migrate both]
+- Dual DB: [yes/no, if svc-experiences, remind to migrate both]
 - PostGIS: [yes/no]
 
 ## Summary
@@ -263,7 +263,7 @@ SEVERITY | DIMENSION | FILE:LINE | DESCRIPTION | FIX
 
 ## Large Table Warnings
 
-[Only if applicable — table name, estimated rows, operation, risk]
+[Only if applicable, table name, estimated rows, operation, risk]
 
 ## Rollback Plan
 

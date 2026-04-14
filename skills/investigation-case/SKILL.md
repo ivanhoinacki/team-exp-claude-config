@@ -89,7 +89,7 @@ Strategy: Parallel evidence collection -> Cross-reference -> Root cause -> Fix p
 
 Before launching ANY evidence collection agents, resolve the full service chain involved.
 
-### Step 0: LE Vault RAG (MCP `local-le-chromadb`) — FIRST
+### Step 0: LE Vault RAG (MCP `local-le-chromadb`), FIRST
 
 Run **`query_vault`** with the incident symptom, error text, ticket id, and suspected domain. Set **`service_filter`** for each service already identified from the ticket (e.g. `svc-experiences`). Use **`list_vault_sources`** if you need filters or coverage. Use hits to seed **hypotheses**, **terminology aliases**, and **known pitfalls** before parallel agents.
 

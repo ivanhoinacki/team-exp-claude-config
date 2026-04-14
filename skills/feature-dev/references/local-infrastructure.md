@@ -69,10 +69,10 @@ Never silently skip infra dependencies. If the feature needs it, flag it.
 
 Before investigating code, check:
 
-1. `docker ps` — are required containers running?
-2. `docker logs <container>` — any container errors?
-3. Port connectivity — is the service reachable on the expected port?
-4. Service env vars — does the service config point to the right port/host?
+1. `docker ps`, are required containers running?
+2. `docker logs <container>`, any container errors?
+3. Port connectivity, is the service reachable on the expected port?
+4. Service env vars, does the service config point to the right port/host?
 
 If infra is the problem, fix it before re-running tests. Don't chase code bugs caused by missing infra.
 

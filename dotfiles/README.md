@@ -16,20 +16,20 @@ Shell configuration templates for the engineering team.
 - **Modern CLI aliases**: `eza` (ls), `bat` (cat), `dust` (du), `delta` (diff), `lazygit`, `lazydocker`
 - **Git shortcuts**: `gs`, `gd`, `gl`, `gp`
 - **Dev helper functions**:
-  - `kp <port>` — kill process on port
-  - `wp <port>` — check what runs on port
-  - `ports` — list all active dev ports
-  - `ts [epoch]` — timestamp converter
-  - `uuid` — generate lowercase UUID
-  - `status <url>` — quick HTTP status check
-  - `dlogs`, `dsh`, `dps` — Docker shortcuts
-  - `rlocal [port]` — Redis connect (prefers iredis)
+  - `kp <port>`, kill process on port
+  - `wp <port>`, check what runs on port
+  - `ports`, list all active dev ports
+  - `ts [epoch]`, timestamp converter
+  - `uuid`, generate lowercase UUID
+  - `status <url>`, quick HTTP status check
+  - `dlogs`, `dsh`, `dps`, Docker shortcuts
+  - `rlocal [port]`, Redis connect (prefers iredis)
 - **Clipboard functions** (macOS: pbpaste, Linux/WSL2: xclip/xsel/powershell.exe):
-  - `jsonf` — format JSON from clipboard
-  - `jwtd` / `jwta` — decode JWT from clipboard
-  - `b64e` / `b64d` — base64 encode/decode
-  - `urle` / `urld` — URL encode/decode
-  - `flushdns` — flush DNS cache (cross-platform)
+  - `jsonf`, format JSON from clipboard
+  - `jwtd` / `jwta`, decode JWT from clipboard
+  - `b64e` / `b64d`, base64 encode/decode
+  - `urle` / `urld`, URL encode/decode
+  - `flushdns`, flush DNS cache (cross-platform)
 
 ## Usage
 

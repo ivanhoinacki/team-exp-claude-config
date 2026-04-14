@@ -1121,7 +1121,7 @@ fi
 
 echo -e "${GREEN}${BOLD}Installed:${NC}"
 MCP_COUNT=$($PYTHON_CMD -c "import json; print(len(json.load(open('$CLAUDE_JSON')).get('mcpServers',{})))" 2>/dev/null || echo "?")
-echo "  $(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | wc -l | tr -d ' ') rules | $(ls -d "$CLAUDE_HOME/.claude/skills/"*/ 2>/dev/null | wc -l | tr -d ' ') skills | $(ls "$CLAUDE_HOME/.claude/agents/"*.md 2>/dev/null | wc -l | tr -d ' ') agents | $MCP_COUNT MCP servers"
+echo "  $(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ') rules | $(ls -d "$CLAUDE_HOME/.claude/skills/"*/ 2>/dev/null | wc -l | tr -d ' ') skills | $(ls "$CLAUDE_HOME/.claude/agents/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ') agents | $MCP_COUNT MCP servers"
 if [ -d "$CLAUDE_HOME/.claude/local-ai/vault" ]; then
   echo "  Vault RAG: scripts installed | $([ -d "$CHROMA_DIR/venv" ] && echo 'venv ready' || echo 'venv missing')"
 fi

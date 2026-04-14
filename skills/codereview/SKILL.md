@@ -8,7 +8,7 @@ model: sonnet
 allowed-tools: Bash(git *), Bash(gh *), Read, Grep, Glob, Agent, mcp__claude_ai_Slack__slack_search_public_and_private, mcp__claude_ai_Slack__slack_read_channel, mcp__claude_ai_Slack__slack_read_thread, mcp__mcp-atlassian__confluence_search, mcp__mcp-atlassian__confluence_get_page
 ---
 
-# Code Review — Full Spectrum
+# Code Review, Full Spectrum
 
 ## Working Directories
 
@@ -236,7 +236,7 @@ Investigate the history behind the implementation. This is NOT optional, even fo
 - **MEDIUM risk**: ALL sub-steps mandatory.
 - **HIGH risk**: ALL sub-steps mandatory + extra diligence (search ALL repos in service chain, read related Confluence ADRs).
 
-1. **LE Vault RAG (MCP `local-le-chromadb`) — FIRST** — Run `query_vault` with PR title/body keywords, ticket id, domain terms, and **`service_filter`** matching the repo (e.g. `svc-experiences`). Use `list_vault_sources` if filters are unclear. Pull review learnings, business-rule reminders, and pitfalls relevant to the change **before** GitHub/Slack/Confluence. If MCP is unavailable, note it and continue.
+1. **LE Vault RAG (MCP `local-le-chromadb`), FIRST**, Run `query_vault` with PR title/body keywords, ticket id, domain terms, and **`service_filter`** matching the repo (e.g. `svc-experiences`). Use `list_vault_sources` if filters are unclear. Pull review learnings, business-rule reminders, and pitfalls relevant to the change **before** GitHub/Slack/Confluence. If MCP is unavailable, note it and continue.
 
 2. **Git history** - check why the code around the change exists. Run for EACH key changed file (not just one):
    ```bash

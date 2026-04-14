@@ -1,6 +1,6 @@
 # Implementation Plan Template (Feature Development)
 
-> Parent skill: [feature-dev/SKILL.md](../SKILL.md) — Phase 4
+> Parent skill: [feature-dev/SKILL.md](../SKILL.md), Phase 4
 
 Generate this plan using KB context + codebase patterns from discovery. Present to user for approval before implementation.
 

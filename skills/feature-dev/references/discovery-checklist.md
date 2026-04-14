@@ -1,19 +1,19 @@
 # Discovery Checklist (Feature Development)
 
-> Parent skill: [feature-dev/SKILL.md](../SKILL.md) — Phases 2 & 3
+> Parent skill: [feature-dev/SKILL.md](../SKILL.md), Phases 2 & 3
 
 ## Phase 2: Knowledge Base & Context Search
 
 Search the company knowledge base BEFORE any planning. This includes local KB mirror, Confluence (via MCP), Slack, and GitHub PRs.
 
-### 2.0 LE Vault RAG (MCP `local-le-chromadb`) — FIRST
+### 2.0 LE Vault RAG (MCP `local-le-chromadb`), FIRST
 
 Indexed semantic store (Chroma collection `le-vault`): review learnings, business rules, service dossiers, runbooks, pitfalls, troubleshooting.
 
 **Always run this before 2.1–2.4** when the MCP is available:
 
-1. **`query_vault`** — Natural language query using feature keywords, ticket id, and domain terms. Set **`service_filter`** when the repo or service is known (e.g. `svc-experiences`, `svc-order`). Optionally set **`type_filter`** (e.g. `business-rule`, `review-learning`, `runbook`) to narrow results.
-2. **`list_vault_sources`** — If unsure which filters apply, list indexed types and top services, then refine `query_vault`.
+1. **`query_vault`**, Natural language query using feature keywords, ticket id, and domain terms. Set **`service_filter`** when the repo or service is known (e.g. `svc-experiences`, `svc-order`). Optionally set **`type_filter`** (e.g. `business-rule`, `review-learning`, `runbook`) to narrow results.
+2. **`list_vault_sources`**, If unsure which filters apply, list indexed types and top services, then refine `query_vault`.
 
 **Zero useful hits?** Broaden the query or retry with terminology aliases (see 2.1) before relying only on grep or Confluence.
 
@@ -121,17 +121,17 @@ Analyze the actual codebase to understand existing patterns.
 
 1. **Project structure:** Bash `ls ~/Documents/LuxuryEscapes/SERVICE/src/`
 
-2. **Similar features:** Grep tool — pattern `DOMAIN_TERM`, path `~/Documents/LuxuryEscapes/SERVICE/src/`, glob `*.ts`, output `files_with_matches`
+2. **Similar features:** Grep tool, pattern `DOMAIN_TERM`, path `~/Documents/LuxuryEscapes/SERVICE/src/`, glob `*.ts`, output `files_with_matches`
 
-3. **Test patterns:** Glob tool — pattern `**/*.test.ts` in `SERVICE/src/`, filter for FEATURE_AREA. Read 1-2 files
+3. **Test patterns:** Glob tool, pattern `**/*.test.ts` in `SERVICE/src/`, filter for FEATURE_AREA. Read 1-2 files
 
-4. **Validation patterns:** Grep tool — pattern `joi|zod|strummer|schema`, path `SERVICE/src/`, output `files_with_matches`, head_limit 5
+4. **Validation patterns:** Grep tool, pattern `joi|zod|strummer|schema`, path `SERVICE/src/`, output `files_with_matches`, head_limit 5
 
-5. **Error handling:** Grep tool — pattern `throw|AppError|HttpError|createError`, path `SERVICE/src/`, glob `*.ts`, output `files_with_matches`, head_limit 5
+5. **Error handling:** Grep tool, pattern `throw|AppError|HttpError|createError`, path `SERVICE/src/`, glob `*.ts`, output `files_with_matches`, head_limit 5
 
-6. **Config patterns:** Glob tool — patterns `**/config*` and `**/schema.ts` in `SERVICE/src/`
+6. **Config patterns:** Glob tool, patterns `**/config*` and `**/schema.ts` in `SERVICE/src/`
 
-7. **Existing CLAUDE.md or .cursorrules:** Read tool — `~/Documents/LuxuryEscapes/SERVICE/CLAUDE.md` (auto-loaded, but read manually if in agent context)
+7. **Existing CLAUDE.md or .cursorrules:** Read tool, `~/Documents/LuxuryEscapes/SERVICE/CLAUDE.md` (auto-loaded, but read manually if in agent context)
 
 ### 3.3 Discovery Checklist
 

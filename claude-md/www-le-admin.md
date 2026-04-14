@@ -1,4 +1,4 @@
-# www-le-admin — Service Dossier
+# www-le-admin, Service Dossier
 
 This file provides unified guidance to all AI coding assistants when working with code in this repository.
 
@@ -268,7 +268,7 @@ All code changes must follow the established contributing guidelines:
   - If you find duplicate or migrated API logic, **ask user for permission to refactor and standardize using shared hooks or queries to eliminate duplication**.
 
 #### TanStack Reusable Hook Architecture
-- **Before creating a new hook, always check if a similar API call or reusable hook already exists.** Avoid duplicating logic—reuse existing hooks where possible.
+- **Before creating a new hook, always check if a similar API call or reusable hook already exists.** Avoid duplicating logic-reuse existing hooks where possible.
 - **ALWAYS create reusable hooks** in `src/hooks/apis/{service}/` - never write `useQuery`/`useMutation` directly in components.
 - **One hook file per resource** - separate files for different resources (e.g., `usePropertyDebug.ts`, `useRoomAmenities.ts`).
 
@@ -469,7 +469,7 @@ export const amenityQueryKeys = {
 * **Never Hardcode Colors/Spacing/Fonts.**
   Always use `theme.palette`, `theme.spacing`, and `theme.typography` for consistency and easy theme updates.
 * **Component-scoped Styling Only.**
-  Use CSS-in-JS (MUI's `styled()`, `sx`)—avoid global or inline CSS except for quick utility use with `sx`.
+  Use CSS-in-JS (MUI's `styled()`, `sx`)-avoid global or inline CSS except for quick utility use with `sx`.
 * **No !important.**
   Never use `!important` unless absolutely necessary and justified in the code review.
 * **Extract Shared Attributes:**
@@ -525,7 +525,7 @@ const MyButton = styled(Button)(({ theme }) => ({
   - Extract magic numbers and repeated strings into constants (e.g., API params, roles, types, default values)
   - Use constants for values like `"content-approved"`, `"admin"`, `"universal_search_id"`, or numbers like `2`, `4`, `10`, `50`, etc.
 * **Remove Redundant or Dead Code:**
-  - Clean up commented or unused code blocks—prefer using version control history if needed
+  - Clean up commented or unused code blocks-prefer using version control history if needed
   - If logic or patterns repeat across files, consider creating a shared utility or abstract component
 
 ---

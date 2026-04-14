@@ -11,10 +11,10 @@ Save a development learning (bug, workaround, pattern, config, pitfall, architec
 
 ## Working Directories
 
-1. **Vault (source of truth)**: `__VAULT_ROOT__` — ALL detailed learnings go here
+1. **Vault (source of truth)**: `__VAULT_ROOT__`, ALL detailed learnings go here
 2. **Memory directory** (auto-memory): the path provided by the system prompt's auto memory section (derived from vault path: `$HOME/.claude/projects/-<vault-path-sanitized>/memory/`). Contains ONLY two files:
-   - `MEMORY.md` — thin index with pointers to vault files
-   - `pitfalls.md` — one-liner gotchas (exception: stays in memory for fast loading)
+   - `MEMORY.md`, thin index with pointers to vault files
+   - `pitfalls.md`, one-liner gotchas (exception: stays in memory for fast loading)
 3. **Codebase**: `__CODEBASE_ROOT__`
 
 **CRITICAL RULES**:
@@ -204,7 +204,7 @@ wc -l MEMORY.md
 
 ### Formatting by category
 
-**For pitfalls (memory/pitfalls.md) — one-liner only:**
+**For pitfalls (memory/pitfalls.md), one-liner only:**
 
 ```
 X. **[Short title]**: [What happens]. Fix: [solution]

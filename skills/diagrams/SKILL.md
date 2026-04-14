@@ -13,7 +13,7 @@ PlantUML for Obsidian/Confluence. Mermaid for GitHub PRs (native rendering, no e
 | Context | Format | Tool |
 |---------|--------|------|
 | **Obsidian vault** (any .md) | ` ```plantuml ` code block with `@startuml`/`@enduml` | Obsidian PlantUML plugin renders live |
-| **GitHub PR body** | ` ```mermaid ` code block | GitHub native rendering — no script needed |
+| **GitHub PR body** | ` ```mermaid ` code block | GitHub native rendering, no script needed |
 | **Confluence** | ` ```plantuml ` code block in the Obsidian source file | Convert to PNG only when publishing |
 
 **Diagram Popup plugin (installed):** All rendered diagrams (PlantUML, Mermaid, Graphviz) can be opened in a draggable, zoomable popup in Obsidian. This means:
@@ -24,7 +24,7 @@ PlantUML for Obsidian/Confluence. Mermaid for GitHub PRs (native rendering, no e
 **Rules:**
 - NEVER generate PNG files for Obsidian vault documents. The plugin renders the code blocks directly.
 - ALWAYS keep PlantUML source in the Obsidian file (editable, versionable).
-- For GitHub PRs: use Mermaid code blocks — GitHub renders them natively without any external script.
+- For GitHub PRs: use Mermaid code blocks, GitHub renders them natively without any external script.
 - Diagrams ALWAYS in English, regardless of the document language.
 
 ## When to Include Diagrams
@@ -138,7 +138,7 @@ Full templates with all diagram types:
 
 ## GitHub PR Diagrams
 
-GitHub renders Mermaid natively in PR descriptions. Use ` ```mermaid ` blocks directly in the PR body — no external tools or scripts needed.
+GitHub renders Mermaid natively in PR descriptions. Use ` ```mermaid ` blocks directly in the PR body, no external tools or scripts needed.
 
 ```mermaid
 sequenceDiagram

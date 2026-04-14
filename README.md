@@ -2,6 +2,18 @@
 
 AI Dev ecosystem for engineering teams. One-command setup that installs rules, skills, agents, hooks, MCP servers, and service dossiers. Works with Claude Code and Cursor.
 
+## Install
+
+```bash
+# macOS
+curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/main/scripts/install.sh | bash
+
+# Linux / WSL2
+curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/main/scripts/install.sh | bash
+```
+
+> The installer detects your platform and runs the correct setup script.
+
 ## What you get
 
 | Component | Count | Purpose |
@@ -14,21 +26,16 @@ AI Dev ecosystem for engineering teams. One-command setup that installs rules, s
 | **MCP Servers** | 8 | Atlassian, Datadog, ChromaDB/vault-rag, Context7, Probe, Playwright, Chrome DevTools, Imugi |
 | **Status Line** | 1 | `user :: dir :: branch :: rate% :: ctx%` |
 
-## Quick start
+## Quick start (manual clone)
 
 ```bash
 cd ~/Documents/LuxuryEscapes
-git clone git@github.com:lux-group/team-exp-claude-config.git
+git clone git@github.com:ivanhoinacki/team-exp-claude-config.git
 cd team-exp-claude-config
 
-# macOS
-bash scripts/setup.sh
-
-# Linux / WSL2
-bash scripts/setup-wsl.sh
+bash scripts/setup.sh        # macOS
+bash scripts/setup-wsl.sh    # Linux / WSL2
 ```
-
-The wizard asks for: name, email, Slack User ID, Atlassian API token, codebase directory.
 
 ## Post-setup
 

@@ -1,0 +1,257 @@
+#!/usr/bin/env zsh
+# =============================================================================
+# Luxury Escapes Engineering — .zshrc template
+# Includes: oh-my-zsh, Spaceship, Zinit, modern CLI tools, dev helper functions
+# =============================================================================
+
+# --- PATH ---
+export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
+
+# --- oh-my-zsh ---
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="spaceship"
+plugins=(git)
+source $ZSH/oh-my-zsh.sh
+
+# --- Homebrew (macOS) / Linuxbrew (Linux/WSL) ---
+if [[ -f /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+elif [[ -f "$HOME/.linuxbrew/bin/brew" ]]; then
+  eval "$("$HOME/.linuxbrew/bin/brew" shellenv)"
+fi
+
+# --- Spaceship config ---
+SPACESHIP_PROMPT_ORDER=(
+  user dir host git exec_time line_sep vi_mode jobs exit_code char
+)
+SPACESHIP_USER_SHOW=always
+SPACESHIP_PROMPT_ADD_NEWLINE=false
+SPACESHIP_CHAR_SYMBOL="❯"
+SPACESHIP_CHAR_SUFFIX=" "
+
+# --- Zinit (plugin manager) ---
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+  command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+  command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git"
+fi
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+zinit light "spaceship-prompt/spaceship-vi-mode"
+zinit light zdharma-continuum/fast-syntax-highlighting
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
+
+# --- NVM ---
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# --- fzf (--zsh flag requires fzf >= 0.33.0, released Sept 2022) ---
+if command -v fzf &>/dev/null; then
+  source <(fzf --zsh) 2>/dev/null || { [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh; }
+fi
+
+# --- zoxide (smart cd: replaces cd) ---
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+
+# --- atuin (shell history with search) ---
+command -v atuin &>/dev/null && eval "$(atuin init zsh)"
+
+# --- PostgreSQL client tools ---
+[[ -d /opt/homebrew/opt/libpq/bin ]] && export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# =============================================================================
+# Modern CLI replacements
+# Install: brew install eza bat dust duf gping git-delta lazygit lazydocker
+# =============================================================================
+command -v eza    &>/dev/null && alias ls="eza --icons --group-directories-first"
+command -v eza    &>/dev/null && alias ll="eza -la --icons --group-directories-first --git"
+command -v eza    &>/dev/null && alias lt="eza --tree --level=2 --icons"
+command -v bat    &>/dev/null && alias cat="bat --paging=never"
+command -v dust   &>/dev/null && alias du="dust"
+command -v duf    &>/dev/null && alias df="duf"
+command -v gping  &>/dev/null && alias ping="gping"
+command -v delta  &>/dev/null && alias diff="delta"
+command -v lazygit    &>/dev/null && alias lg="lazygit"
+command -v lazydocker &>/dev/null && alias lzd="lazydocker"
+
+# --- Git shortcuts ---
+alias gs="git status"
+alias gd="git diff"
+alias gl="git log --oneline -20"
+alias gp="git pull"
+
+# --- Claude Code ---
+# Ensures Claude Code always runs as an independent instance (avoids sub-agent conflicts)
+alias claude='unset CLAUDECODE && command claude'
+
+# =============================================================================
+# Developer helper functions
+# =============================================================================
+
+# Kill process on a port: kp 3000
+kp() {
+  if [ -z "$1" ]; then echo "Usage: kp <port>"; return 1; fi
+  local pids
+  pids=$(lsof -ti :"$1" 2>/dev/null)
+  if [ -n "$pids" ]; then
+    echo "$pids" | xargs kill -9
+    echo "Killed process(es) on port $1: $pids"
+  else
+    echo "Port $1 is not in use"
+  fi
+}
+
+# What process is on a port: wp 3000
+wp() {
+  if [ -z "$1" ]; then echo "Usage: wp <port>"; return 1; fi
+  lsof -i :"$1" -P -n 2>/dev/null || echo "Port $1 is not in use"
+}
+
+# Show all active dev ports (3000-9999)
+ports() {
+  echo "=== Active dev ports ==="
+  lsof -iTCP -sTCP:LISTEN -P -n 2>/dev/null | \
+    grep -E ":(3[0-9]{3}|4[0-9]{3}|5[0-9]{3}|8[0-9]{3}|9[0-9]{3}) " | \
+    awk '{printf "%-8s %-6s %s\n", $1, $2, $9}' | \
+    sort -t: -k2 -n | uniq
+}
+
+# Unix timestamp converter: ts 1717200000 (no arg = now)
+# Cross-platform: macOS uses date -r, Linux uses date -d @
+ts() {
+  if [ -z "$1" ]; then
+    echo "Now: $(date +%s) ($(date))"
+  else
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      date -r "$1" 2>/dev/null || echo "Invalid timestamp: $1"
+    else
+      date -d "@$1" 2>/dev/null || echo "Invalid timestamp: $1"
+    fi
+  fi
+}
+
+# UUID generator
+uuid() { uuidgen | tr "[:upper:]" "[:lower:]"; }
+
+# =============================================================================
+# macOS-only functions (use pbpaste from clipboard)
+# =============================================================================
+if [[ "$OSTYPE" == "darwin"* ]]; then
+
+  # Format JSON from clipboard
+  jsonf() { pbpaste | jq . 2>/dev/null || echo "Clipboard does not contain valid JSON"; }
+
+  # Decode JWT payload from clipboard
+  jwtd() { pbpaste | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null || echo "Clipboard does not contain a valid JWT"; }
+
+  # Decode JWT header + payload from clipboard
+  jwta() {
+    local token; token=$(pbpaste)
+    echo "=== Header ==="
+    echo "$token" | jq -R 'split(".") | .[0] | @base64d | fromjson' 2>/dev/null
+    echo "\n=== Payload ==="
+    echo "$token" | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null
+  }
+
+  # Base64 encode/decode from clipboard
+  b64e() { pbpaste | base64; }
+  b64d() { pbpaste | base64 -d; }
+
+  # URL encode/decode from clipboard
+  urle() { python3 -c "import sys,urllib.parse;print(urllib.parse.quote(sys.stdin.read().strip()))" <<< "$(pbpaste)"; }
+  urld() { python3 -c "import sys,urllib.parse;print(urllib.parse.unquote(sys.stdin.read().strip()))" <<< "$(pbpaste)"; }
+
+  # Flush DNS cache (macOS)
+  flushdns() { sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder && echo "DNS cache flushed"; }
+
+fi
+
+# =============================================================================
+# Linux / WSL2 clipboard functions (equivalent of macOS pbpaste/pbcopy block)
+# =============================================================================
+if [[ "$OSTYPE" == "linux"* ]]; then
+  # Detect environment once at shell startup
+  _IS_WSL=false
+  grep -qi microsoft /proc/version 2>/dev/null && _IS_WSL=true
+
+  # Universal paste helper: WSL2 -> powershell, then xclip/xsel/wl-paste
+  _clip_paste() {
+    if $_IS_WSL && command -v powershell.exe &>/dev/null; then
+      powershell.exe Get-Clipboard 2>/dev/null | sed 's/\r//'
+    elif command -v xclip &>/dev/null; then
+      xclip -selection clipboard -o
+    elif command -v xsel &>/dev/null; then
+      xsel --clipboard --output
+    elif command -v wl-paste &>/dev/null; then
+      wl-paste
+    else
+      echo "" # no clipboard tool available
+    fi
+  }
+
+  # Universal copy helper
+  _clip_copy() {
+    if $_IS_WSL && command -v clip.exe &>/dev/null; then
+      clip.exe
+    elif command -v xclip &>/dev/null; then
+      xclip -selection clipboard -i
+    elif command -v xsel &>/dev/null; then
+      xsel --clipboard --input
+    elif command -v wl-copy &>/dev/null; then
+      wl-copy
+    fi
+  }
+
+  jsonf() { _clip_paste | jq . 2>/dev/null || echo "Clipboard does not contain valid JSON"; }
+
+  jwtd() { _clip_paste | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null || echo "Clipboard does not contain a valid JWT"; }
+
+  jwta() {
+    local token; token=$(_clip_paste)
+    echo "=== Header ==="
+    echo "$token" | jq -R 'split(".") | .[0] | @base64d | fromjson' 2>/dev/null
+    printf "\n=== Payload ===\n"
+    echo "$token" | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null
+  }
+
+  b64e() { _clip_paste | base64; }
+  b64d() { _clip_paste | base64 -d; }
+
+  urle() { python3 -c "import sys,urllib.parse;print(urllib.parse.quote(sys.stdin.read().strip()))" <<< "$(_clip_paste)"; }
+  urld() { python3 -c "import sys,urllib.parse;print(urllib.parse.unquote(sys.stdin.read().strip()))" <<< "$(_clip_paste)"; }
+
+  flushdns() {
+    if $_IS_WSL; then
+      powershell.exe -Command "Clear-DnsClientCache" 2>/dev/null && echo "DNS flushed (Windows)" \
+        || echo "Could not flush DNS via powershell.exe"
+    else
+      sudo systemctl restart systemd-resolved 2>/dev/null && echo "DNS flushed (systemd-resolved)" \
+        || sudo nscd -i hosts 2>/dev/null && echo "DNS flushed (nscd)" \
+        || echo "No supported DNS flush method found"
+    fi
+  }
+fi
+
+# Quick HTTP status check: status https://api.example.com/health
+status() { curl -s -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" "$1"; }
+
+# Largest files in current dir (top 20)
+big() { command -v dust &>/dev/null && dust -n "${1:-20}" || du -sh * | sort -rh | head -"${1:-20}"; }
+
+# Docker shortcuts
+dlogs() { docker logs -f --tail "${2:-100}" "$1"; }
+dsh()   { docker exec -it "$1" /bin/sh; }
+dps()   { docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "Docker not running"; }
+
+# Redis connect (prefers iredis if available)
+rlocal() {
+  local port="${1:-6379}"
+  if command -v iredis &>/dev/null; then iredis -h 127.0.0.1 -p "$port"; else redis-cli -h 127.0.0.1 -p "$port"; fi
+}

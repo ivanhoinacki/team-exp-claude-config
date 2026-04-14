@@ -323,14 +323,50 @@ if [ "$SETUP_TEST_MODE" != "1" ] && [ "$IS_UPDATE" = "false" ]; then
   # --- Codebase root ---
   echo ""
   echo -e "  ${BLUE}Where are your LE repos cloned?${NC}"
+  echo -e "  This is the folder that CONTAINS all your LE repositories."
+  echo -e "  Example: if svc-experiences is at ~/Documents/LuxuryEscapes/svc-experiences,"
+  echo -e "  then your codebase root is ${CYAN}~/Documents/LuxuryEscapes${NC}"
+  echo -e "  Claude will use this path to navigate repos, run commands, and read code."
   prompt_validated "Codebase root: " CODEBASE_ROOT validate_directory \
     "Directory not found." "$HOME/Documents/LuxuryEscapes"
 
-  # --- Vault root ---
+  # --- Vault root (Obsidian) ---
   echo ""
-  echo -e "  ${BLUE}Where is your Obsidian vault? (team knowledge base)${NC}"
+  echo -e "  ${BLUE}Where is your Obsidian vault?${NC}"
+  echo -e "  The vault is a local folder of Markdown files that Claude uses as a knowledge base."
+  echo -e "  It stores: investigation learnings, business rules, session memory, runbooks."
+  echo -e "  If you don't have a vault yet, we'll create one and set up the folder structure."
+  echo ""
+
+  # Check if Obsidian is installed (Linux only - WSL doesn't typically have desktop apps)
+  OBSIDIAN_INSTALLED=false
+  if command -v obsidian &>/dev/null; then
+    OBSIDIAN_INSTALLED=true
+  fi
+
+  if [ "$OBSIDIAN_INSTALLED" = "false" ]; then
+    echo -e "  ${YELLOW}Obsidian not found on this system.${NC}"
+    echo -e "  Obsidian is the desktop app that opens the vault as a visual knowledge base."
+    echo -e "  Without it the vault still works (Claude reads it directly), but"
+    echo -e "  you won't have the UI to browse and edit notes."
+    echo -e "  Install it on your main OS and point it to this vault location."
+    echo ""
+  fi
+
   prompt_validated "Obsidian vault root: " VAULT_ROOT validate_directory \
     "Directory not found." "$HOME/Documents/vault"
+
+  # Create initial vault structure if the folder is new/empty
+  if [ -d "$VAULT_ROOT" ] && [ -z "$(ls -A "$VAULT_ROOT" 2>/dev/null)" ]; then
+    mkdir -p "$VAULT_ROOT/Knowledge-Base/Session-Memory"
+    mkdir -p "$VAULT_ROOT/Knowledge-Base/Business-Rules"
+    mkdir -p "$VAULT_ROOT/Knowledge-Base/Review-Learnings"
+    mkdir -p "$VAULT_ROOT/Development"
+    mkdir -p "$VAULT_ROOT/Runbooks"
+    mkdir -p "$VAULT_ROOT/Prompts"
+    print_ok "Initial vault structure created"
+    print_info "Open Obsidian on your main OS -> 'Open folder as vault' -> select: $VAULT_ROOT"
+  fi
 
   # --- Slack DM Channel ID (optional) ---
   echo ""
@@ -925,6 +961,153 @@ else
 fi
 phase_ok "11-local-ai"
 
+# --- Phase 12: Optional Tools (macOS only) ---
+# Note: WSL/Linux doesn't have Homebrew or app installation in the same way
+if [ "$(uname)" = "Darwin" ]; then
+  print_header "Phase 12: Optional Tools"
+  if [ "$SETUP_TEST_MODE" = "1" ]; then
+    print_ok "Optional tools skipped (test mode)"
+  else
+    echo -e "  ${BLUE}Recommended tools for the best dev experience.${NC}"
+    echo -e "  ${BLUE}All optional — skip any with Enter.${NC}"
+    echo ""
+
+    if ! command -v brew &>/dev/null; then
+      print_warn "Homebrew not found — skipping all optional tools"
+      print_info "Install Homebrew first: https://brew.sh, then re-run setup.sh --reconfigure"
+    else
+      # Warp terminal
+      if ls /Applications/Warp.app &>/dev/null 2>&1; then
+        print_ok "Warp: already installed"
+      else
+        echo -e "  ${CYAN}Warp${NC} — modern terminal with AI, autocomplete, and team sharing"
+        read -p "  Install Warp? (y/n) [y]: " INST_WARP
+        if [ "${INST_WARP:-y}" = "y" ] || [ "${INST_WARP:-y}" = "Y" ]; then
+          brew install --cask warp 2>/dev/null && print_ok "Warp installed" \
+            || print_warn "Warp install failed. Download: https://warp.dev"
+        fi
+      fi
+
+      # oh-my-zsh
+      if [ -d "$HOME/.oh-my-zsh" ]; then
+        print_ok "oh-my-zsh: already installed"
+      else
+        echo -e "  ${CYAN}oh-my-zsh${NC} — zsh framework with themes, plugins, and git status"
+        read -p "  Install oh-my-zsh? (y/n) [y]: " INST_OMZ
+        if [ "${INST_OMZ:-y}" = "y" ] || [ "${INST_OMZ:-y}" = "Y" ]; then
+          RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>/dev/null \
+            && print_ok "oh-my-zsh installed (restart terminal to apply)" \
+            || print_warn "oh-my-zsh install failed. See: https://ohmyz.sh"
+        fi
+      fi
+
+      # OrbStack
+      if ls /Applications/OrbStack.app &>/dev/null 2>&1; then
+        print_ok "OrbStack: already installed"
+      else
+        echo -e "  ${CYAN}OrbStack${NC} — lightweight Docker Desktop replacement (faster, uses less RAM)"
+        read -p "  Install OrbStack? (y/n) [n]: " INST_ORB
+        if [ "${INST_ORB:-n}" = "y" ] || [ "${INST_ORB:-n}" = "Y" ]; then
+          brew install --cask orbstack 2>/dev/null && print_ok "OrbStack installed" \
+            || print_warn "OrbStack install failed. Download: https://orbstack.dev"
+        fi
+      fi
+
+      # Shottr
+      if ls /Applications/Shottr.app &>/dev/null 2>&1; then
+        print_ok "Shottr: already installed"
+      else
+        echo -e "  ${CYAN}Shottr${NC} — screenshot tool with annotations, OCR, and clipboard history"
+        read -p "  Install Shottr? (y/n) [n]: " INST_SHOTTR
+        if [ "${INST_SHOTTR:-n}" = "y" ] || [ "${INST_SHOTTR:-n}" = "Y" ]; then
+          brew install --cask shottr 2>/dev/null && print_ok "Shottr installed" \
+            || print_warn "Shottr install failed. Download: https://shottr.cc"
+        fi
+      fi
+
+      # TablePlus
+      if ls /Applications/TablePlus.app &>/dev/null 2>&1; then
+        print_ok "TablePlus: already installed"
+      else
+        echo -e "  ${CYAN}TablePlus${NC} — database GUI for PostgreSQL, MySQL, SQLite"
+        read -p "  Install TablePlus? (y/n) [n]: " INST_TABLEPLUS
+        if [ "${INST_TABLEPLUS:-n}" = "y" ] || [ "${INST_TABLEPLUS:-n}" = "Y" ]; then
+          brew install --cask tableplus 2>/dev/null && print_ok "TablePlus installed" \
+            || print_warn "TablePlus install failed. Download: https://tableplus.com"
+        fi
+      fi
+    fi
+  fi
+  phase_ok "12-optional-tools"
+else
+  # Linux / WSL2 optional tools
+  print_header "Phase 12: Optional Tools (Linux/WSL2)"
+  if [ "$SETUP_TEST_MODE" = "1" ]; then
+    print_ok "Optional tools skipped (test mode)"
+  else
+    echo -e "  ${BLUE}Recommended tools for the best dev experience.${NC}"
+    echo -e "  ${BLUE}All optional — skip any with Enter.${NC}"
+    echo ""
+
+    # zsh (required for oh-my-zsh and the .zshrc template)
+    if command -v zsh &>/dev/null; then
+      print_ok "zsh: $(zsh --version 2>/dev/null | head -1)"
+    else
+      echo -e "  ${CYAN}zsh${NC} — shell required for oh-my-zsh and the .zshrc template"
+      read -p "  Install zsh? (y/n) [y]: " INST_ZSH
+      if [ "${INST_ZSH:-y}" = "y" ] || [ "${INST_ZSH:-y}" = "Y" ]; then
+        sudo apt-get install -y zsh 2>/dev/null \
+          && print_ok "zsh installed" \
+          || print_warn "zsh install failed. Try: sudo apt-get install zsh"
+      fi
+    fi
+
+    # oh-my-zsh
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+      print_ok "oh-my-zsh: already installed"
+    else
+      echo -e "  ${CYAN}oh-my-zsh${NC} — zsh framework with themes, plugins, and git status"
+      read -p "  Install oh-my-zsh? (y/n) [y]: " INST_OMZ
+      if [ "${INST_OMZ:-y}" = "y" ] || [ "${INST_OMZ:-y}" = "Y" ]; then
+        RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>/dev/null \
+          && print_ok "oh-my-zsh installed (restart terminal to apply)" \
+          || print_warn "oh-my-zsh install failed. See: https://ohmyz.sh"
+      fi
+    fi
+
+    # WSL2 clipboard tool (for pbpaste/pbcopy shims in .zshrc)
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+      if command -v xclip &>/dev/null || command -v xsel &>/dev/null || command -v wl-copy &>/dev/null; then
+        print_ok "Clipboard tool: already installed ($(command -v xclip || command -v xsel || command -v wl-copy))"
+      else
+        echo -e "  ${CYAN}xclip${NC} — clipboard bridge for WSL2 (enables jsonf, b64e, jwtd helpers)"
+        read -p "  Install xclip? (y/n) [y]: " INST_XCLIP
+        if [ "${INST_XCLIP:-y}" = "y" ] || [ "${INST_XCLIP:-y}" = "Y" ]; then
+          sudo apt-get install -y xclip 2>/dev/null \
+            && print_ok "xclip installed" \
+            || print_warn "xclip install failed. Try: sudo apt-get install xclip"
+        fi
+      fi
+    fi
+
+    # Modern CLI tools via apt
+    echo ""
+    echo -e "  ${BLUE}Modern CLI tools:${NC}"
+    declare -A CLI_TOOLS=( ["bat"]="bat" ["fd-find"]="fdfind" ["ripgrep"]="rg" ["jq"]="jq" ["fzf"]="fzf" )
+    for pkg in "${!CLI_TOOLS[@]}"; do
+      cmd="${CLI_TOOLS[$pkg]}"
+      if command -v "$cmd" &>/dev/null; then
+        print_ok "$pkg: already installed"
+      else
+        sudo apt-get install -y "$pkg" 2>/dev/null \
+          && print_ok "$pkg installed" \
+          || print_warn "$pkg not installed. Try: sudo apt-get install $pkg"
+      fi
+    done
+  fi
+  phase_ok "12-optional-tools"
+fi
+
 # --- Version save + Cleanup old backups (keep last 3) ---
 echo "$REPO_VERSION" > "$VERSION_FILE"
 ls -dt "$CLAUDE_HOME/.claude/.setup-backup-"* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
@@ -961,6 +1144,29 @@ echo -e "${CYAN}Reconfigure:  bash scripts/setup-wsl.sh --reconfigure${NC}"
 echo -e "${CYAN}Rollback:     cp -r $BACKUP_DIR/.claude/* ~/.claude/${NC}"
 echo ""
 echo -e "${GREEN}${BOLD}Version $REPO_VERSION installed. Phases: ${PHASES_COMPLETED[*]}${NC}"
+
+# Vault RAG status (if Local AI enabled)
+if [ "$INSTALL_LOCAL_AI" = "y" ] || [ "$INSTALL_LOCAL_AI" = "Y" ]; then
+  if curl -sf "http://localhost:8100/api/v2/heartbeat" > /dev/null 2>&1; then
+    echo ""
+    echo -e "${CYAN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}${BOLD}  Vault RAG — running${NC}"
+    echo -e "${CYAN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "  ChromaDB dashboard:  ${CYAN}http://localhost:8100${NC}"
+    echo ""
+    echo -e "  Use in ${BOLD}Claude Code${NC}:"
+    echo -e "    ${CYAN}query_vault(\"your question here\")${NC}"
+    echo ""
+    echo -e "  Use in ${BOLD}Cursor${NC}:"
+    echo -e "    Reference ${CYAN}@local-le-chromadb${NC} in your prompt"
+    echo ""
+    echo -e "  CLI:"
+    echo -e "    ${CYAN}vault-query \"boolean validation zod\"${NC}"
+    echo -e "    ${CYAN}vault-index --full${NC}   (re-index everything)"
+    echo -e "    ${CYAN}vault-watch${NC}           (auto-index on file changes)"
+  fi
+fi
 
 # ============================================================================
 # Verification prompt (paste into Claude Code or Cursor after setup)

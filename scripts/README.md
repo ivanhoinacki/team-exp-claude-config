@@ -6,7 +6,7 @@ Setup, maintenance, and verification scripts for the AI Dev Ecosystem.
 
 | Script | Purpose | Platform |
 |---|---|---|
-| `install.sh` | One-line curl installer — detects platform and runs the correct setup | All |
+| `install.sh` | One-line curl installer, detects platform and runs the correct setup | All |
 | `setup.sh` | Full interactive installer for macOS (12 phases) | macOS |
 | `setup-wsl.sh` | Full interactive installer for Linux/WSL2 (12 phases) | Linux/WSL2 |
 | `update.sh` | Update an existing installation from the latest repo | All |

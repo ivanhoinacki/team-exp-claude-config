@@ -242,7 +242,7 @@ if [ "$SETUP_TEST_MODE" != "1" ]; then
       print_ok "Loaded from saved config"
       print_info "$USER_FULL_NAME <$USER_EMAIL>"
       if [ "$SLACK_DM_ID" = "__SLACK_DM_ID__" ]; then
-        print_info "Slack DM ID not configured — run setup.sh --reconfigure to set it"
+        print_info "Slack DM ID not configured, run setup.sh --reconfigure to set it"
       fi
     else
       print_error "Config file corrupted. Switching to interactive mode."
@@ -321,7 +321,7 @@ if [ "$SETUP_TEST_MODE" != "1" ]; then
         if command -v brew &>/dev/null; then
           echo "  Installing Obsidian..."
           brew install --cask obsidian 2>/dev/null \
-            && print_ok "Obsidian installed — open it after setup to configure the vault" \
+            && print_ok "Obsidian installed, open it after setup to configure the vault" \
             || print_warn "Install failed. Download manually: https://obsidian.md/download"
         else
           print_info "Homebrew not found. Download Obsidian from: https://obsidian.md/download"
@@ -1006,18 +1006,18 @@ if [ "$SETUP_TEST_MODE" = "1" ]; then
   print_ok "Optional tools skipped (test mode)"
 else
   echo -e "  ${BLUE}Recommended tools for the best dev experience.${NC}"
-  echo -e "  ${BLUE}All optional — skip any with Enter.${NC}"
+  echo -e "  ${BLUE}All optional, skip any with Enter.${NC}"
   echo ""
 
   if ! command -v brew &>/dev/null; then
-    print_warn "Homebrew not found — skipping all optional tools"
+    print_warn "Homebrew not found, skipping all optional tools"
     print_info "Install Homebrew first: https://brew.sh, then re-run setup.sh --reconfigure"
   else
     # Warp terminal
     if ls /Applications/Warp.app &>/dev/null 2>&1; then
       print_ok "Warp: already installed"
     else
-      echo -e "  ${CYAN}Warp${NC} — modern terminal with AI, autocomplete, and team sharing"
+      echo -e "  ${CYAN}Warp${NC}, modern terminal with AI, autocomplete, and team sharing"
       read -p "  Install Warp? (y/n) [y]: " INST_WARP
       if [ "${INST_WARP:-y}" = "y" ] || [ "${INST_WARP:-y}" = "Y" ]; then
         brew install --cask warp 2>/dev/null && print_ok "Warp installed" \
@@ -1029,7 +1029,7 @@ else
     if [ -d "$HOME/.oh-my-zsh" ]; then
       print_ok "oh-my-zsh: already installed"
     else
-      echo -e "  ${CYAN}oh-my-zsh${NC} — zsh framework with Spaceship theme, Zinit plugins, modern CLI aliases"
+      echo -e "  ${CYAN}oh-my-zsh${NC}, zsh framework with Spaceship theme, Zinit plugins, modern CLI aliases"
       read -p "  Install oh-my-zsh + full terminal config? (y/n) [y]: " INST_OMZ
       if [ "${INST_OMZ:-y}" = "y" ] || [ "${INST_OMZ:-y}" = "Y" ]; then
         RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>/dev/null \
@@ -1071,7 +1071,7 @@ else
     if ls /Applications/OrbStack.app &>/dev/null 2>&1; then
       print_ok "OrbStack: already installed"
     else
-      echo -e "  ${CYAN}OrbStack${NC} — lightweight Docker Desktop replacement (faster, uses less RAM)"
+      echo -e "  ${CYAN}OrbStack${NC}, lightweight Docker Desktop replacement (faster, uses less RAM)"
       read -p "  Install OrbStack? (y/n) [n]: " INST_ORB
       if [ "${INST_ORB:-n}" = "y" ] || [ "${INST_ORB:-n}" = "Y" ]; then
         brew install --cask orbstack 2>/dev/null && print_ok "OrbStack installed" \
@@ -1083,7 +1083,7 @@ else
     if ls /Applications/Shottr.app &>/dev/null 2>&1; then
       print_ok "Shottr: already installed"
     else
-      echo -e "  ${CYAN}Shottr${NC} — screenshot tool with annotations, OCR, and clipboard history"
+      echo -e "  ${CYAN}Shottr${NC}, screenshot tool with annotations, OCR, and clipboard history"
       read -p "  Install Shottr? (y/n) [n]: " INST_SHOTTR
       if [ "${INST_SHOTTR:-n}" = "y" ] || [ "${INST_SHOTTR:-n}" = "Y" ]; then
         brew install --cask shottr 2>/dev/null && print_ok "Shottr installed" \
@@ -1095,7 +1095,7 @@ else
     if ls /Applications/TablePlus.app &>/dev/null 2>&1; then
       print_ok "TablePlus: already installed"
     else
-      echo -e "  ${CYAN}TablePlus${NC} — database GUI for PostgreSQL, MySQL, SQLite"
+      echo -e "  ${CYAN}TablePlus${NC}, database GUI for PostgreSQL, MySQL, SQLite"
       read -p "  Install TablePlus? (y/n) [n]: " INST_TABLEPLUS
       if [ "${INST_TABLEPLUS:-n}" = "y" ] || [ "${INST_TABLEPLUS:-n}" = "Y" ]; then
         brew install --cask tableplus 2>/dev/null && print_ok "TablePlus installed" \
@@ -1154,7 +1154,7 @@ if [ "$INSTALL_LOCAL_AI" = "y" ] || [ "$INSTALL_LOCAL_AI" = "Y" ]; then
   if curl -sf "http://localhost:8100/api/v2/heartbeat" > /dev/null 2>&1; then
     echo ""
     echo -e "${CYAN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${CYAN}${BOLD}  Vault RAG — running${NC}"
+    echo -e "${CYAN}${BOLD}  Vault RAG, running${NC}"
     echo -e "${CYAN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     echo -e "  ChromaDB dashboard:  ${CYAN}http://localhost:8100${NC}"

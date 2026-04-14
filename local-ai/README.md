@@ -10,7 +10,7 @@ local-ai/
     vault_index.py    # Index vault markdown files into ChromaDB
     vault_query.sh    # CLI query interface for vault search
     vault_chroma.sh   # ChromaDB container management (start/stop/status)
-    vault_watch.sh    # File watcher — re-indexes on vault changes
+    vault_watch.sh    # File watcher, re-indexes on vault changes
     vault_mcp_server.py  # MCP server exposing vault search to Claude
     README.md         # Detailed vault RAG documentation
 ```
@@ -32,10 +32,10 @@ Obsidian Vault (.md files)
 
 ## Prerequisites
 
-- **Docker** — runs ChromaDB container
-- **Ollama** — runs the embedding model locally (`nomic-embed-text`)
+- **Docker**, runs ChromaDB container
+- **Ollama**, runs the embedding model locally (`nomic-embed-text`)
 - **Python 3** with `chromadb`, `ollama` packages (installed in a venv)
-- **fswatch** (macOS) or **inotifywait** (Linux) — for file watching
+- **fswatch** (macOS) or **inotifywait** (Linux), for file watching
 
 ## Setup
 
@@ -65,7 +65,7 @@ vault-chroma start|stop|status
 ## MCP Integration
 
 The `vault_mcp_server.py` exposes two tools to Claude:
-- `query_vault` — semantic search with optional service/type filters
-- `list_vault_sources` — list available document types and services
+- `query_vault`, semantic search with optional service/type filters
+- `list_vault_sources`, list available document types and services
 
 Registered as `local-le-chromadb` in `~/.claude.json`.

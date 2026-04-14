@@ -156,7 +156,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     local token; token=$(pbpaste)
     echo "=== Header ==="
     echo "$token" | jq -R 'split(".") | .[0] | @base64d | fromjson' 2>/dev/null
-    echo "\n=== Payload ==="
+    printf "\n=== Payload ===\n"
     echo "$token" | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null
   }
 

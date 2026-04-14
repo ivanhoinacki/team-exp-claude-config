@@ -128,7 +128,7 @@ if [ -f "$MCP_FILE" ]; then
   # local-le-chromadb is optional (only if Local AI enabled)
   python3 -c "import json; d=json.load(open('$MCP_FILE')); assert 'local-le-chromadb' in d.get('mcpServers',{})" 2>/dev/null \
     && pass "local-le-chromadb configured (Local AI enabled)" \
-    || warn "local-le-chromadb not configured (Local AI disabled — expected if you skipped it)"
+    || warn "local-le-chromadb not configured (Local AI disabled, expected if you skipped it)"
 
   MCP_COUNT=$(python3 -c "import json; d=json.load(open('$MCP_FILE')); print(len(d.get('mcpServers',{})))" 2>/dev/null)
   [ "$MCP_COUNT" -ge 7 ] && pass "Total: $MCP_COUNT MCP servers" || fail "Expected 7+ MCP servers, found $MCP_COUNT"

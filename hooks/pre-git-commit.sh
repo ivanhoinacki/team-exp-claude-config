@@ -19,11 +19,19 @@ cd "$cwd" || exit 0
 # Skip if not a Node.js project
 [ ! -f "package.json" ] && exit 0
 
+# Detect package manager: yarn > pnpm > npm
+PKG_MGR="npm"
+if [ -f "yarn.lock" ] && command -v yarn &>/dev/null; then
+  PKG_MGR="yarn"
+elif [ -f "pnpm-lock.yaml" ] && command -v pnpm &>/dev/null; then
+  PKG_MGR="pnpm"
+fi
+
 errors=""
 
 # Check if lint script exists
 if jq -e '.scripts.lint' package.json >/dev/null 2>&1; then
-  lint_out=$(yarn lint 2>&1)
+  lint_out=$($PKG_MGR lint 2>&1)
   if [ $? -ne 0 ]; then
     # Trim to last 30 lines to avoid flooding
     errors="${errors}LINT FAILED:\n$(echo "$lint_out" | tail -30)\n\n"
@@ -32,12 +40,12 @@ fi
 
 # Check if types script exists
 if jq -e '.scripts["test:types"]' package.json >/dev/null 2>&1; then
-  types_out=$(yarn test:types 2>&1)
+  types_out=$($PKG_MGR test:types 2>&1)
   if [ $? -ne 0 ]; then
     errors="${errors}TYPE CHECK FAILED:\n$(echo "$types_out" | tail -30)\n\n"
   fi
 elif jq -e '.scripts.typecheck' package.json >/dev/null 2>&1; then
-  types_out=$(yarn typecheck 2>&1)
+  types_out=$($PKG_MGR typecheck 2>&1)
   if [ $? -ne 0 ]; then
     errors="${errors}TYPE CHECK FAILED:\n$(echo "$types_out" | tail -30)\n\n"
   fi

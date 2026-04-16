@@ -6,10 +6,10 @@ AI Dev ecosystem for engineering teams. One-command setup that installs rules, s
 
 ```bash
 # macOS
-curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/main/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/v1.1.0/scripts/install.sh | bash
 
 # Linux / WSL2
-curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/main/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/v1.1.0/scripts/install.sh | bash
 ```
 
 > The installer detects your platform and runs the correct setup script.
@@ -18,13 +18,13 @@ curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/
 
 | Component | Count | Purpose |
 |---|---|---|
-| **Rules** | 8 | Behavioral guardrails (auto-loaded every conversation) |
+| **Rules** | 9 | Behavioral guardrails (auto-loaded every conversation) |
 | **Skills** | 16 | Automated workflows: `/commit`, `/create-pr`, `/feature-dev`, `/investigation-case`, etc. |
 | **Agents** | 4 | Specialized sub-agents: Copilot, Researcher, Implementer, Reviewer |
-| **Hooks** | 22 | Lifecycle automation: pre-commit checks, skill enforcement, tool preferences, context, logging |
+| **Hooks** | 25 | Lifecycle automation: pre-commit checks, skill enforcement, db-tunnel guard, session-end-save, context, logging |
 | **Service Dossiers** | 9 | CLAUDE.md per repo (stack, commands, patterns, gotchas) |
 | **MCP Servers** | 8 | Atlassian, Datadog, ChromaDB/vault-rag, Context7, Probe, Playwright, Chrome DevTools, Imugi |
-| **Status Line** | 1 | `user :: dir :: branch :: rate% :: ctx%` |
+| **Scripts** | 2 | plantuml_encode.py (diagram URLs), ci-local-check.sh (local CI) |
 
 ## Quick start (manual clone)
 
@@ -48,7 +48,7 @@ claude                     # open Claude Code
 
 ```bash
 claude mcp list            # 8 MCPs
-ls ~/.claude/rules/        # 8 files
+ls ~/.claude/rules/        # 9 files
 ls ~/.claude/skills/       # 16+ directories
 ls ~/.claude/agents/       # 4 files
 ```
@@ -65,6 +65,7 @@ team-exp-claude-config/
     04-study-before-starting.md
     05-diagrams-standard.md
     06-worktree-detection.md
+    07-agent-model-defaults.md
     08-behavioral-standards.md
   skills/                  # 16 slash command workflows
     commit/                #   /commit - format enforced
@@ -88,13 +89,15 @@ team-exp-claude-config/
     researcher.md          #   Sonnet, read-only discovery
     implementer.md         #   Opus, code implementation
     reviewer.md            #   Opus, read-only review
-  hooks/                   # 22 lifecycle hooks (all installed)
+  hooks/                   # 25 lifecycle hooks (all installed)
     pre-git-commit.sh
     skill-enforcement-guard.sh
     tool-preference-guard.sh
+    db-tunnel-guard.sh
+    agent-model-guard.sh
+    session-end-save.sh
     skill-tracker.sh
     session-start-check.sh
-    statusline-command.sh
     vault-rag-reminder.sh
     frontend-layout-guard.sh
     worktree-setup.sh
@@ -120,7 +123,7 @@ The setup syncs rules and MCP servers to Cursor automatically (Phase 10, opt-in)
 
 | Feature | Claude Code | Cursor | Shared? |
 |---|---|---|---|
-| Rules (8) | `~/.claude/rules/*.md` | `~/.cursor/rules/*.mdc` | Yes, auto-synced |
+| Rules (9) | `~/.claude/rules/*.md` | `~/.cursor/rules/*.mdc` | Yes, auto-synced |
 | MCP Servers (8) | `~/.claude/claude.json` | `~/.cursor/mcp.json` | Yes, auto-synced |
 | Skills (16) | `~/.claude/skills/` | Not supported | Claude Code only |
 | Hooks | `settings.json` | Not supported | Claude Code only |

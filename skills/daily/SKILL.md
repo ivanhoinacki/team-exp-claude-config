@@ -26,7 +26,7 @@ effort: low
 3. Did you encounter any blockers? How did you resolve them?
 4. Anything else relevant?
 
-## Generate one file (EN only)
+## Generate two files
 
 Use $ARGUMENTS as date if provided, otherwise use today.
 
@@ -36,15 +36,32 @@ Files go inside a month subfolder under `Dailies/`:
 
 ```
 Dailies/{Mon}/YYYY-MM-DD.md
+Dailies/{Mon}/YYYY-MM-DD-en.md
 ```
 
 Where `{Mon}` is the abbreviated English month name (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec).
 
-Example: `Dailies/Mar/2026-03-12.md`
+Example: `Dailies/Mar/2026-03-12.md` and `Dailies/Mar/2026-03-12-en.md`
 
 Create the month folder if it doesn't exist yet.
 
-### EN: `YYYY-MM-DD.md`
+### PT-BR: `YYYY-MM-DD.md`
+
+```markdown
+# Daily – DD/MM/YYYY
+
+## Storytelling
+
+Good evening everyone, good morning team.
+
+[Fluid narrative connecting activities. Professional but natural tone.
+Tasks in declarative format: "task 3303, which is about adding schedule support".
+Each topic in a separate paragraph for readability.
+Continuous text, not bullet points.
+Ends with blockers and tasks status: "No blockers and no tasks assigned at the moment" or equivalent.]
+```
+
+### EN: `YYYY-MM-DD-en.md`
 
 ```markdown
 # Daily – MM/DD/YYYY
@@ -55,8 +72,7 @@ Good evening everyone, good morning team.
 
 [Simple English for B1 level. Short sentences, easy vocabulary.
 Tasks with pronunciation: "task 3303 (thirty-three oh three)".
-Each topic in a separate paragraph for readability.
-Continuous text, not bullet points.
+Same structure as PT-BR: one paragraph per topic, separated by blank lines.
 Ends with blockers/tasks status: "No blockers and no tasks assigned at the moment." or equivalent.]
 ```
 
@@ -76,7 +92,7 @@ Ends with blockers/tasks status: "No blockers and no tasks assigned at the momen
 1. **Writing outside month folder**: Files MUST go to `Dailies/{Mon}/`, not `Dailies/` root. Always build the path with the abbreviated month name
 2. **Including non-dev activities**: Mentioning Claude usage, automations, doc updates, Slack message sends, memory saves, or prompt engineering. Only include development work, meetings, and technical decisions
 3. **Using bullet points**: The daily must be narrative text, not lists. Each topic as a separate paragraph
-4. **Missing pronunciation**: Every number needs pronunciation in parentheses. EXP-3463 (thirty-four sixty-three), PR #1636 (sixteen thirty-six)
+4. **Missing pronunciation in EN**: Every number in the EN version needs pronunciation in parentheses. EXP-3463 (thirty-four sixty-three), PR #1636 (sixteen thirty-six)
 5. **Wrong timeline placement**: Putting afternoon activities in the "yesterday post-daily" block. Always check timestamps from commits/messages to place correctly
 6. **Including implementation details**: Mentioning function names, test counts, or line numbers. The audience is PM/tech lead, not PR reviewer
 7. **Passive voice instead of active**: WRONG: "the migrations were merged". RIGHT: "I merged the PRs". Always use first person active voice describing what the user DID, not what happened passively
@@ -90,17 +106,18 @@ Ends with blockers/tasks status: "No blockers and no tasks assigned at the momen
 
 ## General Rules
 
-- **Always start with greeting**: "Good evening everyone, good morning team." (customize to your team lead's name)
+- **Always start with greeting**: "Good evening everyone, good morning team."
 - Write as continuous narrative, not bullet points
 - Connect tasks, meetings, and problem-solving naturally
 - Use declarative form for task numbers
 
-## Verification (MANDATORY before saving file)
+## Verification (MANDATORY before saving files)
 
-- [ ] File saved to `Dailies/{Mon}/` subfolder (not root)
-- [ ] Greeting present
-- [ ] Blockers/tasks status at the end
-- [ ] Pronunciation for ALL numbers
+- [ ] Files saved to `Dailies/{Mon}/` subfolder (not root)
+- [ ] Both versions generated (PT-BR + EN)
+- [ ] Greeting present in both versions
+- [ ] Blockers/tasks status at the end of both versions
+- [ ] EN version has pronunciation for ALL numbers
 - [ ] No bullet points or lists, narrative only
 - [ ] No non-dev activities (automations, docs, Claude, Slack)
 - [ ] Timeline blocks in correct order (yesterday post-daily, today morning, today afternoon)

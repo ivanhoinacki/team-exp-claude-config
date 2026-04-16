@@ -209,13 +209,16 @@ The "Claude Risk Score: N" label is set by a bot that parses the PR body + diff.
 
 ## Execution
 
+**CRITICAL: Execute `gh pr create` IMMEDIATELY after generating the body. Do NOT do anything else between body generation and PR creation. Compaction can happen at any time and will lose the generated body, wasting all the work. The sequence below is atomic: steps 2-5 must happen in rapid succession without interruption.**
+
 1. Generate Mermaid diagrams (see [references/pr-template.md](references/pr-template.md), Diagram Guidelines section)
 2. Push branch: `git push -u origin $(git branch --show-current)`
-3. Build PR body with Mermaid code blocks (GitHub renders natively)
-4. **Detect related PRs** (see Related PRs & Merge Order section below)
-5. Create PR **as draft**: `gh pr create --draft` with the full body via HEREDOC
-6. Return the PR link in markdown so user can click it
-7. **Launch CI Pipeline Monitor** (background agent, see [references/ci-monitor.md](references/ci-monitor.md))
+3. **Detect related PRs** (see Related PRs & Merge Order section below)
+4. Build PR body with Mermaid code blocks (GitHub renders natively) AND create PR **as draft** in THE SAME Bash call: `gh pr create --draft --title "..." --body "$(cat <<'EOF' ... EOF)"`. Never split body generation and PR creation into separate steps.
+5. Return the PR link in markdown so user can click it
+6. **Launch CI Pipeline Monitor** (background agent, see [references/ci-monitor.md](references/ci-monitor.md))
+
+**Anti-pattern**: generating the full PR body in one message, then creating the PR in the next message. If compaction happens between them, the body is lost and must be regenerated.
 
 **IMPORTANT**: PRs are ALWAYS created as draft. The user promotes to "ready for review" manually after validation.
 

@@ -58,6 +58,41 @@ if echo "$prompt" | grep -qiE 'pulumi|infra|aws|ecs|rds|s3|lambda|deploy|env.var
 "
 fi
 
+# Local infra scan: BEFORE starting, running, testing, or debugging any LE service
+cwd="$(pwd)"
+if echo "$cwd" | grep -qE 'LuxuryEscapes/'; then
+  if echo "$prompt" | grep -qiE 'start|run|dev|test|debug|error|bug|fix|local|setup|serve|build|yarn dev|npm start|docker|redis|postgres|nginx'; then
+    ctx="${ctx}DOMAIN CONTEXT [Local Infra - SCAN FIRST]:
+- BEFORE starting services or debugging: scan what is already running
+- Run: docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | head -30
+- Check OrbStack: orb list 2>/dev/null || true
+- Check node processes: lsof -iTCP -sTCP:LISTEN -P | grep node | head -10
+- Common ports: nginx :8083, postgres16 :5439, redis4 :6379, redis5 :6380, svc-experiences :8893
+- DO NOT start/restart containers that are already running
+- DO NOT create new docker-compose files or redis/postgres instances. infra-le-local-dev provides ALL shared infra
+- infra-le-local-dev is ALWAYS running (OrbStack). It provides: postgres16, redis4, redis5, nginx, and more
+- If a container is down: cd ~/Documents/LuxuryEscapes/infra-le-local-dev && docker compose up -d <service>
+- NEVER docker-compose up from scratch or recreate the infra stack. Just restart the specific container
+"
+  fi
+fi
+
+# Frontend repos: auto-suggest browser MCPs when debugging/testing/developing
+if echo "$cwd" | grep -qE 'www-le-customer|www-le-admin'; then
+  if echo "$prompt" | grep -qiE 'error|bug|test|visual|layout|page|render|console|network|screenshot|broken|blank|white.screen|not.showing|not.loading|debug|inspect|css|style|responsive|mobile|ui'; then
+    ctx="${ctx}DOMAIN CONTEXT [Frontend Debug]:
+- You are in a frontend repo. USE browser MCPs for debugging:
+  - Playwright (mcp__playwright__*): navigate, snapshot, console, network requests, screenshots
+  - Chrome DevTools (mcp__chrome-devtools__*): evaluate JS, inspect DOM, network, console, performance
+  - Imugi (mcp__imugi__*): visual comparison, capture, analyze screenshots
+- Workflow: open page -> take screenshot -> check console errors -> check network failures -> diagnose
+- Load tools first via ToolSearch before calling them
+- Local URLs: customer http://localhost:3000, admin http://localhost:3001
+- ALWAYS check console errors and network requests when investigating UI issues
+"
+  fi
+fi
+
 if [ -n "$ctx" ]; then
   printf '%s' "$ctx"
 fi

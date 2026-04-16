@@ -1,20 +1,20 @@
 ---
 name: diagrams
-description: Diagram standard. Use when creating diagrams, flowcharts, sequence diagrams, entity diagrams, or when the user mentions "diagram", "diagrama", "plantuml", "mermaid", "sequence", "flowchart", "entity diagram", "C4".
+description: PlantUML diagram standard. Use when creating diagrams, flowcharts, sequence diagrams, entity diagrams, or when the user mentions "diagram", "diagrama", "plantuml", "sequence", "flowchart", "entity diagram", "C4".
 model: haiku
 effort: low
 ---
 
-# Diagrams Standard
+# Diagrams Standard (PlantUML)
 
-PlantUML for Obsidian/Confluence. Mermaid for GitHub PRs (native rendering, no external tools).
+All diagrams in documentation MUST use PlantUML. No Mermaid, no ASCII art, no external image tools. PlantUML is the single standard for all visual documentation.
 
 ## Where and How
 
 | Context | Format | Tool |
 |---------|--------|------|
 | **Obsidian vault** (any .md) | ` ```plantuml ` code block with `@startuml`/`@enduml` | Obsidian PlantUML plugin renders live |
-| **GitHub PR body** | ` ```mermaid ` code block | GitHub native rendering, no script needed |
+| **GitHub PR body** | `![Title](PNG URL)` | `python3 ~/.claude/scripts/plantuml_encode.py /tmp/diagram.puml` |
 | **Confluence** | ` ```plantuml ` code block in the Obsidian source file | Convert to PNG only when publishing |
 
 **Diagram Popup plugin (installed):** All rendered diagrams (PlantUML, Mermaid, Graphviz) can be opened in a draggable, zoomable popup in Obsidian. This means:
@@ -25,7 +25,7 @@ PlantUML for Obsidian/Confluence. Mermaid for GitHub PRs (native rendering, no e
 **Rules:**
 - NEVER generate PNG files for Obsidian vault documents. The plugin renders the code blocks directly.
 - ALWAYS keep PlantUML source in the Obsidian file (editable, versionable).
-- For GitHub PRs: use Mermaid code blocks, GitHub renders them natively without any external script.
+- For GitHub PRs: extract PlantUML blocks to `/tmp/<name>.puml`, encode to PNG URL, replace in PR body. Keep source in Obsidian.
 - Diagrams ALWAYS in English, regardless of the document language.
 
 ## When to Include Diagrams
@@ -137,17 +137,18 @@ Full templates with all diagram types:
 - Confluence docs: `Templates/Confluence-Technical-Doc.md`
 - C4 examples: `Runbooks/svc-experiences/diagrams/`
 
-## GitHub PR Diagrams
+## GitHub PR Encoding
 
-GitHub renders Mermaid natively in PR descriptions. Use ` ```mermaid ` blocks directly in the PR body, no external tools or scripts needed.
+Script: `~/.claude/scripts/plantuml_encode.py`
 
-```mermaid
-sequenceDiagram
-    participant A as Service A
-    participant B as Service B
-    A->>B: request
-    B-->>A: response
+```bash
+# Get PNG URL for PR body
+python3 ~/.claude/scripts/plantuml_encode.py /tmp/diagram.puml
+
+# Download PNG file
+python3 ~/.claude/scripts/plantuml_encode.py /tmp/diagram.puml /path/to/output.png
 ```
 
-- Supported diagram types: flowchart, sequence, class, entity-relationship, state, Gantt.
-- No Java, no PlantUML server, no encoding script required.
+- User-Agent header required (PlantUML server returns 403 without it). Script handles this.
+- URLs are deterministic (same source = same URL).
+- No Java or PlantUML installation needed.

@@ -600,23 +600,25 @@ phase_ok "4.6-dossiers"
 # ============================================================================
 # Phase 5: Hooks + Status Line
 # ============================================================================
-print_header "Phase 5: Hooks + Status Line"
+print_header "Phase 5: Hooks"
 mkdir -p "$CLAUDE_HOME/.claude/hooks"
 HOOK_COUNT=0
 
-# All hooks (22)
+# All hooks
 for hook in "$REPO_ROOT/hooks/"*.sh; do
   [ -f "$hook" ] || continue
-  hook_name=$(basename "$hook")
-  if [ "$hook_name" = "statusline-command.sh" ]; then
-    cp "$hook" "$CLAUDE_HOME/.claude/statusline-command.sh"
-  else
-    cp "$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
-  fi
+  cp "$hook" "$CLAUDE_HOME/.claude/hooks/" && HOOK_COUNT=$((HOOK_COUNT + 1))
 done
 chmod +x "$CLAUDE_HOME/.claude/hooks/"*.sh 2>/dev/null || true
-chmod +x "$CLAUDE_HOME/.claude/statusline-command.sh" 2>/dev/null || true
-print_ok "$HOOK_COUNT hooks + status line installed"
+print_ok "$HOOK_COUNT hooks installed"
+
+# Scripts (plantuml_encode.py etc.)
+mkdir -p "$CLAUDE_HOME/.claude/scripts"
+for script in "$REPO_ROOT/scripts/plantuml_encode.py"; do
+  [ -f "$script" ] && cp "$script" "$CLAUDE_HOME/.claude/scripts/"
+done
+chmod +x "$CLAUDE_HOME/.claude/scripts/"*.py 2>/dev/null || true
+print_ok "Scripts installed"
 phase_ok "5-hooks"
 
 # ============================================================================
@@ -636,17 +638,13 @@ if [ ! -f "$CLAUDE_HOME/.claude/settings.json" ]; then
   },
   "hooks": {
     "PreToolUse": [
-      {"matcher":"Bash","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-enforcement-guard.sh","timeout":5,"statusMessage":"Checking skill enforcement..."},{"type":"command","command":"$HOME/.claude/hooks/tool-preference-guard.sh","timeout":3}]},
+      {"matcher":"Bash","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-enforcement-guard.sh","timeout":5,"statusMessage":"Checking skill enforcement..."},{"type":"command","command":"$HOME/.claude/hooks/tool-preference-guard.sh","timeout":3},{"type":"command","command":"$HOME/.claude/hooks/db-tunnel-guard.sh","timeout":3,"statusMessage":"Checking DB access method..."}]},
       {"matcher":"Bash(git commit)","hooks":[{"type":"command","command":"$HOME/.claude/hooks/pre-git-commit.sh","timeout":120,"statusMessage":"Running pre-commit checks (lint + types)..."}]},
       {"matcher":"Agent","hooks":[{"type":"command","command":"$HOME/.claude/hooks/agent-model-guard.sh","timeout":3,"statusMessage":"Validating Agent model parameter..."}]}
     ],
     "PostToolUse": [{"matcher":"Skill","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-tracker.sh","timeout":3}]}],
     "SessionStart": [{"matcher":"startup|resume","hooks":[{"type":"command","command":"~/.claude/hooks/session-start-check.sh","timeout":10}]}],
     "Notification": [{"matcher":"","hooks":[{"type":"command","command":"printf '\\a' > /dev/tty"}]}]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
   },
   "language": "English",
   "effortLevel": "medium",
@@ -1188,8 +1186,8 @@ Run a full setup verification. Check each item and report a table with status (P
 1. **Rules**: list files in ~/.claude/rules/, confirm 8 .md files exist and none contain __PLACEHOLDER__ strings
 2. **Skills**: list dirs in ~/.claude/skills/, confirm each has a SKILL.md, count total
 3. **Agents**: list files in ~/.claude/agents/, confirm 4 .md files, none contain __PLACEHOLDER__ strings
-4. **Hooks**: list files in ~/.claude/hooks/, confirm 22 .sh files are executable, confirm ~/.claude/statusline-command.sh exists
-5. **Settings**: read ~/.claude/settings.json, confirm valid JSON with keys: hooks, statusLine, permissions, env
+4. **Hooks**: list files in ~/.claude/hooks/, confirm .sh files are executable
+5. **Settings**: read ~/.claude/settings.json, confirm valid JSON with keys: hooks, permissions, env
 6. **MCP Servers**: read ~/.claude.json, confirm mcpServers has at minimum: mcp-atlassian, datadog-mcp, context7, probe, playwright, chrome-devtools, imugi (7 base). If local-le-chromadb exists (Local AI enabled), check the python and script paths exist on disk. Report total count
 7. **Placeholders**: grep recursively in ~/.claude/rules/, ~/.claude/skills/, ~/.claude/agents/ for any remaining __PLACEHOLDER__ patterns (double underscore prefix+suffix). Report any found
 8. **Vault RAG** (if ~/.claude/local-ai/vault/ exists): confirm vault scripts present (vault_mcp_server.py, vault_index.py, vault_chroma.sh, vault_watch.sh), confirm Python venv at ~/.local/share/le-vault-chroma/venv/bin/python3, check if ChromaDB is running (curl localhost:8100/api/v2/heartbeat), check if Ollama is running and has nomic-embed-text model

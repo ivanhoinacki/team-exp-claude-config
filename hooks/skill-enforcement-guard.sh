@@ -13,8 +13,13 @@ command=$(echo "$input" | jq -r '.tool_input.command // empty')
 
 [ -z "$command" ] && exit 0
 
-# Use PPID as session proxy (same approach as vault-rag-tracker.sh)
-state_file="/tmp/claude-skills-${PPID}"
+# Use session_id for cross-process visibility, fallback to PPID
+session_id=$(echo "$input" | jq -r '.session_id // empty')
+if [ -n "$session_id" ]; then
+  state_file="/tmp/claude-skills-${session_id}"
+else
+  state_file="/tmp/claude-skills-${PPID}"
+fi
 
 # Strip content inside quotes and after echo/printf/cat to avoid false positives
 # on test commands like: echo '{"command":"git commit"}' | ./script.sh

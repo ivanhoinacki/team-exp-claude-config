@@ -176,13 +176,13 @@ header "Rules"
 RULES_DIR="$TEST_HOME/.claude/rules"
 assert_dir "$RULES_DIR" "rules directory exists"
 
-EXPECTED_RULES=("00-global-style.md" "01-code-quality-review.md" "02-skills-first.md" "03-escalation-protocol.md" "04-study-before-starting.md" "05-diagrams-standard.md" "06-worktree-detection.md" "08-behavioral-standards.md")
+EXPECTED_RULES=("00-global-style.md" "01-code-quality-review.md" "02-skills-first.md" "03-escalation-protocol.md" "04-study-before-starting.md" "05-diagrams-standard.md" "06-worktree-detection.md" "07-agent-model-defaults.md" "08-behavioral-standards.md")
 for rule in "${EXPECTED_RULES[@]}"; do
   assert_file "$RULES_DIR/$rule" "rule: $rule"
 done
 
 RULE_COUNT=$(ls "$RULES_DIR/"*.md 2>/dev/null | grep -v "README.md" | wc -l | tr -d ' ')
-assert_count "$RULE_COUNT" 8 "total rules"
+assert_count "$RULE_COUNT" 9 "total rules"
 
 for rule in "${EXPECTED_RULES[@]}"; do
   SIZE=$(wc -c < "$RULES_DIR/$rule" 2>/dev/null | tr -d ' ')
@@ -256,16 +256,17 @@ for hook in "${EXPECTED_CORE_HOOKS[@]}"; do
   assert_exec "$HOOKS_DIR/$hook" "hook executable: $hook"
 done
 
-EXPECTED_OPTIONAL_HOOKS=("agent-lifecycle-log.sh" "config-change-log.sh" "cwd-context.sh" "elicitation-log.sh" "file-changed-log.sh" "frontend-layout-guard.sh" "instructions-audit.sh" "permission-denied-handler.sh" "post-tool-failure-log.sh" "postcompact-log.sh" "precompact-backup.sh" "stop-failure-handler.sh" "user-prompt-context.sh" "vault-rag-reminder.sh" "vault-rag-tracker.sh" "worktree-remove.sh" "worktree-setup.sh")
+EXPECTED_OPTIONAL_HOOKS=("agent-lifecycle-log.sh" "agent-model-guard.sh" "config-change-log.sh" "cwd-context.sh" "db-tunnel-guard.sh" "elicitation-log.sh" "file-changed-log.sh" "frontend-layout-guard.sh" "instructions-audit.sh" "permission-denied-handler.sh" "post-tool-failure-log.sh" "postcompact-log.sh" "precompact-backup.sh" "session-end-save.sh" "stop-failure-handler.sh" "user-prompt-context.sh" "vault-rag-reminder.sh" "vault-rag-tracker.sh" "worktree-remove.sh" "worktree-setup.sh")
 for hook in "${EXPECTED_OPTIONAL_HOOKS[@]}"; do
   assert_file "$HOOKS_DIR/$hook" "hook: $hook"
 done
 
-assert_file "$TEST_HOME/.claude/statusline-command.sh" "statusline-command.sh installed"
-assert_exec "$TEST_HOME/.claude/statusline-command.sh" "statusline-command.sh executable"
+# plantuml_encode.py utility script
+assert_file "$TEST_HOME/.claude/scripts/plantuml_encode.py" "plantuml_encode.py installed"
+assert_exec "$TEST_HOME/.claude/scripts/plantuml_encode.py" "plantuml_encode.py executable"
 
 HOOK_COUNT=$(ls "$HOOKS_DIR/"*.sh 2>/dev/null | wc -l | tr -d ' ')
-assert_count "$HOOK_COUNT" 22 "total hook scripts"
+assert_count "$HOOK_COUNT" 25 "total hook scripts"
 
 # ============================================================================
 # Test 6: Settings
@@ -278,7 +279,7 @@ assert_file "$SETTINGS" "settings.json exists"
 python3 -c "import json; json.load(open('$SETTINGS'))" 2>/dev/null && pass "valid JSON" || fail "invalid JSON"
 
 assert_json_key "$SETTINGS" "'hooks' in d" "has hooks"
-assert_json_key "$SETTINGS" "'statusLine' in d" "has statusLine"
+assert_json_key "$SETTINGS" "'statusLine' not in d" "no statusLine (removed, using built-in)"
 assert_json_key "$SETTINGS" "'permissions' in d" "has permissions"
 assert_json_key "$SETTINGS" "'env' in d" "has env"
 
@@ -286,16 +287,15 @@ assert_json_key "$SETTINGS" "'PreToolUse' in d['hooks']" "hooks: PreToolUse"
 assert_json_key "$SETTINGS" "'SessionStart' in d['hooks']" "hooks: SessionStart"
 assert_json_key "$SETTINGS" "'Notification' in d['hooks']" "hooks: Notification"
 
-# PreToolUse[0] = all-Bash hooks (skill-enforcement + tool-preference), PreToolUse[1] = git-commit-only (pre-commit)
+# PreToolUse[0] = Bash (enforcement + tool-pref + db-tunnel-guard), [1] = Bash(git commit), [2] = Agent (model-guard)
 PRE_ENTRIES=$(python3 -c "import json; d=json.load(open('$SETTINGS')); print(len(d['hooks']['PreToolUse']))" 2>/dev/null)
-assert_count "$PRE_ENTRIES" 2 "PreToolUse has 2 entries (all-Bash + git-commit)"
+assert_count "$PRE_ENTRIES" 3 "PreToolUse has 3 entries (Bash + git-commit + Agent)"
 PRE_ALL_HOOKS=$(python3 -c "import json; d=json.load(open('$SETTINGS')); print(len(d['hooks']['PreToolUse'][0]['hooks']))" 2>/dev/null)
-assert_count "$PRE_ALL_HOOKS" 2 "PreToolUse[0] has 2 hooks (enforcement + tool-pref)"
+assert_count "$PRE_ALL_HOOKS" 3 "PreToolUse[0] has 3 hooks (enforcement + tool-pref + db-tunnel)"
 PRE_COMMIT_MATCHER=$(python3 -c "import json; d=json.load(open('$SETTINGS')); print(d['hooks']['PreToolUse'][1]['matcher'])" 2>/dev/null)
 [ "$PRE_COMMIT_MATCHER" = "Bash(git commit)" ] && pass "PreToolUse[1] scoped to git commit" || fail "PreToolUse[1] matcher: '$PRE_COMMIT_MATCHER'"
-
-SL_TYPE=$(python3 -c "import json; d=json.load(open('$SETTINGS')); print(d['statusLine']['type'])" 2>/dev/null)
-[ "$SL_TYPE" = "command" ] && pass "statusLine type is 'command'" || fail "statusLine type: '$SL_TYPE'"
+PRE_AGENT_MATCHER=$(python3 -c "import json; d=json.load(open('$SETTINGS')); print(d['hooks']['PreToolUse'][2]['matcher'])" 2>/dev/null)
+[ "$PRE_AGENT_MATCHER" = "Agent" ] && pass "PreToolUse[2] scoped to Agent" || fail "PreToolUse[2] matcher: '$PRE_AGENT_MATCHER'"
 
 # ============================================================================
 # Test 7: MCP Servers
@@ -426,7 +426,7 @@ header "Summary Output"
 run_with_spinner "Running (final output check)..." bash "$REPO_ROOT/scripts/$SETUP_SCRIPT"
 FINAL_OUTPUT="$SPINNER_OUTPUT"
 
-echo "$FINAL_OUTPUT" | grep -q "8 rules" && pass "summary: 8 rules" || fail "summary missing 8 rules"
+echo "$FINAL_OUTPUT" | grep -q "9 rules" && pass "summary: 9 rules" || fail "summary missing 9 rules"
 echo "$FINAL_OUTPUT" | grep -qE "1[5-8] skills" && pass "summary: skills count present" || fail "summary missing skills count"
 echo "$FINAL_OUTPUT" | grep -q "4 agents" && pass "summary: 4 agents" || fail "summary missing 4 agents"
 echo "$FINAL_OUTPUT" | grep -q "$EXPECTED_MCP_COUNT MCP" && pass "summary: $EXPECTED_MCP_COUNT MCP servers" || fail "summary missing $EXPECTED_MCP_COUNT MCP"

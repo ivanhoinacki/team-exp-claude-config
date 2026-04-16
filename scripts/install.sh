@@ -4,7 +4,7 @@ set -e
 # ============================================================================
 # Quick Install - Clone repo and run full setup
 # Detects platform: macOS -> setup.sh | Linux/WSL2 -> setup-wsl.sh
-# Usage: curl -sSL https://raw.githubusercontent.com/lux-group/team-exp-claude-config/main/scripts/install.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/v1.1.0/scripts/install.sh | bash
 # ============================================================================
 
 RED='\033[0;31m'
@@ -14,7 +14,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-echo -e "${CYAN}${BOLD}AI Dev Ecosystem - Luxury Escapes${NC}"
+echo -e "${CYAN}${BOLD}AI Dev Ecosystem${NC}"
 echo ""
 
 # Detect platform
@@ -34,15 +34,17 @@ fi
 echo -e "${CYAN}Platform: ${BOLD}$PLATFORM${NC}"
 echo ""
 
-# Clone repo
-REPO_DIR="$HOME/.claude-team-config"
-if [ -d "$REPO_DIR" ]; then
+# Clone repo to standard location
+REPO_DIR="$HOME/Documents/LuxuryEscapes/team-exp-claude-config"
+mkdir -p "$(dirname "$REPO_DIR")"
+
+if [ -d "$REPO_DIR/.git" ]; then
   echo "Updating existing config..."
   cd "$REPO_DIR" && git pull origin main 2>/dev/null
 else
   echo "Cloning team config..."
-  git clone git@github.com:lux-group/team-exp-claude-config.git "$REPO_DIR" 2>/dev/null || \
-  git clone https://github.com/lux-group/team-exp-claude-config.git "$REPO_DIR"
+  git clone git@github.com:ivanhoinacki/team-exp-claude-config.git "$REPO_DIR" 2>/dev/null || \
+  git clone https://github.com/ivanhoinacki/team-exp-claude-config.git "$REPO_DIR"
 fi
 
 # Run platform-specific setup

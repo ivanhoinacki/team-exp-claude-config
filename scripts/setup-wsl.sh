@@ -611,8 +611,11 @@ phase_ok "6-hooks"
 print_header "Phase 7: Settings"
 # NOTE: settings.json uses $HOME (not $CLAUDE_HOME) because Claude Code reads this
 # at runtime where $HOME is the real user home. CLAUDE_HOME is only for test isolation.
-if [ ! -f "$CLAUDE_HOME/.claude/settings.json" ]; then
-  cat > "$CLAUDE_HOME/.claude/settings.json" << 'EOF'
+#
+# When settings.json already exists, `hooks` and `permissions` are overwritten
+# (project guard rails must stay current), `env` is merged (template wins on
+# conflict), and all other top-level keys are preserved from the user's file.
+SETTINGS_TEMPLATE=$(cat << 'EOF'
 {
   "env": {
     "CLAUDE_CODE_SHELL": "/bin/bash",
@@ -641,9 +644,41 @@ if [ ! -f "$CLAUDE_HOME/.claude/settings.json" ]; then
   "mcpServers": {}
 }
 EOF
+)
+
+SETTINGS_FILE="$CLAUDE_HOME/.claude/settings.json"
+
+if [ ! -f "$SETTINGS_FILE" ]; then
+  printf '%s\n' "$SETTINGS_TEMPLATE" > "$SETTINGS_FILE"
   print_ok "settings.json created"
+elif command -v python3 &>/dev/null; then
+  SETTINGS_FILE="$SETTINGS_FILE" SETTINGS_TEMPLATE="$SETTINGS_TEMPLATE" python3 <<'PYEOF'
+import json, os, sys
+path = os.environ['SETTINGS_FILE']
+template = json.loads(os.environ['SETTINGS_TEMPLATE'])
+try:
+    with open(path) as f:
+        existing = json.load(f)
+except (OSError, json.JSONDecodeError) as e:
+    sys.stderr.write(f"settings.json invalid or unreadable ({e}); overwriting with template\n")
+    existing = {}
+# Canonical sections: overwrite (project guard rails)
+existing['hooks'] = template['hooks']
+existing['permissions'] = template['permissions']
+# env: shallow merge, template wins on conflict
+env = existing.get('env') or {}
+env.update(template.get('env', {}))
+existing['env'] = env
+# Preference keys: keep existing if set, otherwise take template
+for key in ('statusLine', 'language', 'effortLevel', 'voiceEnabled', 'mcpServers'):
+    existing.setdefault(key, template.get(key))
+with open(path, 'w') as f:
+    json.dump(existing, f, indent=2)
+    f.write('\n')
+PYEOF
+  print_ok "settings.json merged (hooks + permissions refreshed, custom keys preserved)"
 else
-  print_ok "settings.json preserved (exists)"
+  print_warn "python3 not found, settings.json left untouched. Run scripts/update.sh after installing python3 to sync hooks."
 fi
 phase_ok "7-settings"
 

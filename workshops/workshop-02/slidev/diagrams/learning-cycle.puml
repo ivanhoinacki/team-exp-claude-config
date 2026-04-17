@@ -1,0 +1,61 @@
+@startuml
+skinparam backgroundColor #ffffff
+skinparam DefaultFontName Sora
+skinparam DefaultFontColor #1a1a1a
+skinparam DefaultFontSize 13
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam padding 5
+
+skinparam rectangle {
+    BorderColor #d96a1f
+    FontColor #1a1a1a
+    BackgroundColor #fff4ec
+}
+
+skinparam note {
+    BorderColor #d96a1f
+    BackgroundColor #fff9f3
+    FontColor #3a3a3a
+}
+
+skinparam arrow {
+    Color #d96a1f
+    FontColor #3a3a3a
+}
+
+rectangle "**1. Bug Found**" as bug #ffe6e6 {
+  rectangle "CS report or\nerror in Datadog" as trigger #ffe6e6
+}
+
+rectangle "**2. Investigate**" as investigate #fff4ec {
+  rectangle "/investigation-case\n7 agents in parallel" as inv #fff0db
+}
+
+rectangle "**3. Fix & Learn**" as fix #e6f4ea {
+  rectangle "/debug-mode\nfix the code" as dbg #d7ebdc
+  rectangle "/learn\ncapture gotcha" as learn #d7ebdc
+}
+
+rectangle "**4. Knowledge Grows**" as knowledge #e6edf7 {
+  rectangle "Vault .md saved\nChromaDB indexes (~30s)" as vault #d7dfed
+}
+
+rectangle "**5. Next Task Benefits**" as next #f1e6f5 {
+  rectangle "/feature-dev Phase 2\nquery_vault finds the gotcha\n**before** coding" as benefit #f1e6f5
+}
+
+bug -down-> investigate
+investigate -down-> fix
+fix -down-> knowledge
+knowledge -down-> next
+next -left-> bug : Next bug is\ncaught earlier
+
+note right of knowledge
+  Each investigation makes
+  the system **smarter**.
+  3 months = hundreds of
+  accumulated knowledge chunks.
+end note
+
+@enduml

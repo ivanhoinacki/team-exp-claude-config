@@ -1,0 +1,20 @@
+{
+  "name": "workshop-02-slidev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "slidev --open --port 3030",
+    "build": "slidev build --base /team-exp-claude-config/workshop-02/ --out dist",
+    "build:local": "slidev build",
+    "export": "slidev export --output workshop-02.pdf",
+    "export-pptx": "slidev export --format pptx --output workshop-02.pptx"
+  },
+  "dependencies": {
+    "@slidev/cli": "^0.49.0",
+    "@slidev/theme-default": "^0.25.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.59.1"
+  }
+}

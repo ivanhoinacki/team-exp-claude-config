@@ -1,0 +1,517 @@
+@font-face {
+  font-family: 'Sora';
+  src: url('/fonts/Sora[wght].woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== Global theme ===== */
+#slide-content,
+.slidev-layout,
+.slidev-page {
+  background: #000000 !important;
+  color: #e5e5e5 !important;
+  font-family: 'Sora', 'Inter', 'Segoe UI', sans-serif !important;
+  font-weight: 500;
+}
+
+/* Content slides: h1 stays pinned at the top (consistent across
+   slides), remaining content is vertically centered in the area
+   below using the margin-auto trick on flex children.
+   Cover/section/fact/statement/quote keep their own layouts. */
+.slidev-layout.default {
+  display: flex;
+  flex-direction: column;
+}
+
+/* H1 sits at top with no extra push-down */
+.slidev-layout.default > h1:first-child {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+/* First element after h1 grabs the top slack, last element grabs
+   the bottom slack — the content block between them ends up
+   vertically centered in the remaining space. */
+.slidev-layout.default > h1:first-child + * {
+  margin-top: auto;
+}
+.slidev-layout.default > :last-child:not(h1) {
+  margin-bottom: auto;
+}
+
+/* Constrain wide tables/content blocks so they don't feel stuck
+   against the slide edges on large screens. */
+.slidev-layout.default > * {
+  max-width: 100%;
+}
+
+body {
+  background: #000000;
+}
+
+/* Logo LE on every slide (top-right) */
+.slidev-layout::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 46px;
+  height: 46px;
+  background-image: url('/luxury-escapes.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  filter: invert(1);
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ===== Typography (Sora Medium everywhere) ===== */
+.slidev-layout h1 {
+  color: #ff8c42 !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.2em !important;
+}
+
+.slidev-layout ul,
+.slidev-layout ol {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+.slidev-layout ul li,
+.slidev-layout ol li {
+  line-height: 1.35;
+  margin: 0.08em 0;
+}
+
+.slidev-layout h2 {
+  color: #d8d8d8 !important;
+  font-weight: 500 !important;
+  font-size: 1.1em !important;
+  line-height: 1.3;
+}
+
+.slidev-layout h3 {
+  color: #c8c8c8 !important;
+  font-weight: 500 !important;
+  font-size: 0.95em !important;
+}
+
+.slidev-layout strong {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+.slidev-layout a {
+  color: #ffb37a !important;
+}
+
+.slidev-layout blockquote {
+  border-left: 4px solid #ff8c42;
+  padding-left: 14px;
+  color: #bdbdbd;
+  font-style: italic;
+  background: transparent !important;
+}
+
+/* ===== Tables (Linear/Stripe inspired) ===== */
+.slidev-layout table {
+  font-size: 0.78em;
+  color: #f5f5f5 !important;
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.4em 0;
+}
+
+.slidev-layout table th {
+  background: #1a1a1a !important;
+  color: #ff8c42 !important;
+  font-weight: 600 !important;
+  text-align: left;
+  padding: 10px 14px !important;
+  border: 1px solid #3a3a3a !important;
+}
+
+.slidev-layout table td {
+  color: #f5f5f5 !important;
+  padding: 8px 14px !important;
+  border: 1px solid #3a3a3a !important;
+  background: #0a0a0a !important;
+  vertical-align: top;
+}
+
+.slidev-layout table tr:nth-child(even) td {
+  background: #141414 !important;
+}
+
+/* ===== Code ===== */
+.slidev-layout code {
+  background: #111111;
+  color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.slidev-layout pre {
+  background: #0a0a0a !important;
+  border: 1px solid #1f1f1f;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.75em;
+  line-height: 1.3;
+  margin: 0.25em 0;
+}
+
+/* Compact code for slides with tall code blocks */
+.slidev-layout .compact-code pre {
+  font-size: 0.65em;
+  line-height: 1.25;
+  padding: 6px 10px;
+}
+
+/* CLAUDE.md hands-on steps (slide 25) */
+.slidev-layout .claude-md-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin-top: 0.4em;
+}
+.slidev-layout .claude-md-steps .step {
+  font-size: 0.9em;
+  line-height: 1.35;
+}
+.slidev-layout .claude-md-steps .step > p {
+  margin: 0.2em 0;
+}
+.slidev-layout .claude-md-steps .step ul {
+  margin: 0.25em 0 0.25em 1.1em;
+  font-size: 0.92em;
+}
+.slidev-layout .claude-md-steps .step li {
+  margin: 0.12em 0;
+}
+.slidev-layout .claude-md-steps .compact-code {
+  margin: 0.25em 0;
+}
+.slidev-layout .claude-md-steps .compact-code pre {
+  font-size: 0.6em;
+  padding: 5px 9px;
+}
+
+.slidev-layout pre code,
+.slidev-layout .shiki {
+  background: transparent !important;
+  padding: 0;
+}
+
+.shiki,
+.shiki span {
+  background: transparent !important;
+}
+
+/* ===== Cover / section slides ===== */
+.slidev-layout.cover,
+.slidev-layout.section {
+  background: #000000 !important;
+}
+
+.slidev-layout.cover h1,
+.slidev-layout.section h1 {
+  color: #ff8c42 !important;
+  font-weight: 500 !important;
+  font-size: 44.5px !important;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+  text-align: center;
+  margin: 0 0 !important;
+}
+
+.slidev-layout.cover h2,
+.slidev-layout.section h2 {
+  color: #d8d8d8 !important;
+  font-weight: 500 !important;
+  font-size: 18px !important;
+  text-align: center;
+}
+
+/* ===== Cover title (custom, bypasses Slidev h1 sizing) ===== */
+.cover-title {
+  color: #ff8c42;
+  font-family: 'Sora', 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 44.5px;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Custom helpers ===== */
+.lead-subtitle {
+  color: #d7d7d7;
+  font-weight: 500;
+  font-size: 18px;
+  margin-top: 0.8em;
+  text-align: center;
+}
+
+.lead-divider {
+  width: 40%;
+  height: 2px;
+  margin: 0.6em auto;
+  background: #5a5a5a;
+}
+
+.lead-tagline {
+  color: #d7d7d7;
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+.lead-meta {
+  color: #d7d7d7;
+  font-weight: 500;
+  font-size: 18px;
+  text-align: center;
+}
+
+.lead-footer {
+  position: absolute;
+  bottom: 20px;
+  right: 32px;
+  color: #d7d7d7;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.highlight {
+  background: #0d0d0d;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border-left: 4px solid #ff8c42;
+  margin: 0.4em 0;
+}
+
+.metric {
+  text-align: center;
+  font-size: 2.8em;
+  font-weight: 700;
+  color: #ff8c42;
+  line-height: 1;
+}
+
+.metric-label {
+  text-align: center;
+  font-size: 0.9em;
+  color: #909090;
+  margin-top: 4px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.card {
+  background: linear-gradient(135deg, #0d0d0d 0%, #161616 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  border-color: #ff8c42;
+  transform: translateY(-2px);
+}
+
+/* ===== Table fade-in on slide entry ===== */
+.table-fade-in {
+  animation: tableFadeIn 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes tableFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Auto-stagger cascade on slide entry (no clicks needed) ===== */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-list li,
+.stagger-list > p,
+.stagger-last {
+  opacity: 0;
+  animation: fadeSlideUp 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.stagger-list li:nth-child(1)  { animation-delay: 0.08s; }
+.stagger-list li:nth-child(2)  { animation-delay: 0.22s; }
+.stagger-list li:nth-child(3)  { animation-delay: 0.36s; }
+.stagger-list li:nth-child(4)  { animation-delay: 0.50s; }
+.stagger-list li:nth-child(5)  { animation-delay: 0.64s; }
+.stagger-list li:nth-child(6)  { animation-delay: 0.78s; }
+.stagger-list li:nth-child(7)  { animation-delay: 0.92s; }
+.stagger-list li:nth-child(8)  { animation-delay: 1.06s; }
+.stagger-list li:nth-child(9)  { animation-delay: 1.20s; }
+.stagger-list li:nth-child(10) { animation-delay: 1.34s; }
+.stagger-list li:nth-child(11) { animation-delay: 1.48s; }
+.stagger-list li:nth-child(12) { animation-delay: 1.62s; }
+.stagger-last { animation-delay: 1.80s; }
+
+/* ===== Smooth fragments ===== */
+.slidev-vclick-target {
+  transition: opacity 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+              transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) !important;
+}
+
+.slidev-vclick-hidden {
+  opacity: 0 !important;
+  transform: translateY(6px);
+}
+
+/* ===== Page number ===== */
+.slidev-page {
+  color: #6f6f6f !important;
+}
+
+/* ===== Mermaid diagram sizing ===== */
+.slidev-layout .mermaid {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0.2em auto 0.3em;
+  position: relative;
+  max-width: 44%;
+  max-height: 54vh;
+}
+
+.slidev-layout .mermaid.mermaid-zoomable {
+  cursor: zoom-in;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 140, 66, 0.25);
+  background: #0a0a0a;
+  padding: 8px 10px;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+.slidev-layout .mermaid.mermaid-zoomable:hover {
+  transform: scale(1.015);
+  border-color: rgba(255, 140, 66, 0.55);
+  box-shadow: 0 10px 36px rgba(255, 140, 66, 0.22);
+}
+
+.slidev-layout .mermaid svg {
+  max-height: 48vh !important;
+  max-width: 100% !important;
+  height: auto !important;
+  width: 100% !important;
+  display: block;
+}
+
+.slidev-layout .mermaid.mermaid-zoomable::after {
+  content: 'click to zoom';
+  color: #8c8c8c;
+  font-size: 0.48em;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Fullscreen zoom overlay */
+.mermaid-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.96);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  backdrop-filter: blur(12px);
+  padding: 40px;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.mermaid-zoom-overlay.is-open {
+  opacity: 1;
+}
+
+.mermaid-zoom-svg {
+  max-width: 92vw;
+  max-height: 86vh;
+  background: #0a0a0a;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 140, 66, 0.3);
+}
+
+.mermaid-zoom-hint {
+  color: #909090;
+  font-size: 0.9em;
+  margin-top: 1.2em;
+  font-family: 'Sora', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.lifecycle-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0.15em;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  background: #0d0d0d;
+  color: #ff8c42;
+  border: 1px solid rgba(255, 140, 66, 0.45);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.58em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Hide goto dialog unless focused (prevents stuck-open overlay) */
+#slidev-goto-dialog {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+#slidev-goto-dialog:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}

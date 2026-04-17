@@ -1,0 +1,90 @@
+@startuml
+skinparam backgroundColor #ffffff
+skinparam DefaultFontName Sora
+skinparam DefaultFontColor #1a1a1a
+skinparam DefaultFontSize 13
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam padding 5
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+skinparam sequence {
+    ArrowColor #d96a1f
+    ArrowFontColor #1a1a1a
+    LifeLineBorderColor #9a9a9a
+    LifeLineBackgroundColor #ffffff
+
+    ParticipantBorderColor #d96a1f
+    ParticipantBackgroundColor #fff4ec
+    ParticipantFontColor #1a1a1a
+
+    ActorBorderColor #d96a1f
+    ActorBackgroundColor #fff4ec
+    ActorFontColor #1a1a1a
+
+    GroupHeaderFontColor #ffffff
+    GroupBackgroundColor #d96a1f
+    GroupBorderColor #d96a1f
+    GroupFontColor #ffffff
+    GroupBodyBackgroundColor #fafafa
+
+    DividerBackgroundColor #fff4ec
+    DividerBorderColor #d96a1f
+    DividerFontColor #d96a1f
+}
+
+skinparam note {
+    BorderColor #d96a1f
+    BackgroundColor #fff9f3
+    FontColor #3a3a3a
+}
+
+actor "Developer" as dev
+participant "Claude Code" as claude
+participant "PreToolUse\nHooks" as pre
+participant "Tool\nExecution" as tool
+participant "PostToolUse\nHooks" as post
+participant "Stop\nHooks" as stop
+
+== Before Tool Runs ==
+
+dev -> claude : User input (e.g. "git commit")
+claude -> pre : Check guards
+note right of pre
+  **skill-enforcement**: blocks git commit direct
+  **tool-preference**: redirects cat to Read
+  **db-tunnel-guard**: blocks le aws postgres
+  **agent-model-guard**: enforces Haiku/Sonnet
+  **pre-git-commit**: runs lint + types
+  **cwd-context**: injects service context
+end note
+
+alt blocked
+  pre --> claude : **BLOCK** (use /commit)
+else allowed
+  pre --> claude : pass
+end
+
+== Tool Runs ==
+
+claude -> tool : Execute
+tool --> claude : Result
+
+== After Tool Runs ==
+
+claude -> post : Log & track
+note right of post
+  **skill-tracker**: log skill executed
+  **file-changed-log**: log files modified
+end note
+
+== Task Complete ==
+
+claude -> stop : Finish
+stop --> dev : **BEEP** (notification)
+note right of stop
+  **failure-handler**: suggest recovery if error
+end note
+
+@enduml

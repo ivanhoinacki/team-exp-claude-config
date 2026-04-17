@@ -1,0 +1,107 @@
+name: Deploy workshops
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workshops/**'
+      - '.github/workflows/deploy-workshops.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: workshops/workshop-02/slidev/package-lock.json
+
+      - name: Install deps (workshop-02)
+        working-directory: workshops/workshop-02/slidev
+        run: npm ci
+
+      - name: Install Chromium for PDF export
+        working-directory: workshops/workshop-02/slidev
+        run: npx playwright install chromium --with-deps
+
+      - name: Build workshop-02 (HTML)
+        working-directory: workshops/workshop-02/slidev
+        run: npm run build
+
+      - name: Export workshop-02 (PDF)
+        working-directory: workshops/workshop-02/slidev
+        run: npm run export
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/workshop-02
+          cp -r workshops/workshop-02/slidev/dist/* _site/workshop-02/
+          cp workshops/workshop-02/slidev/workshop-02.pdf _site/workshop-02.pdf
+          cp workshops/README.md _site/README.md
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>LE Engineering - Workshops</title>
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 720px; margin: 4rem auto; padding: 0 1.5rem; color: #222; background: #fafafa; }
+              h1 { color: #ff8c42; margin-bottom: 0.2rem; }
+              .sub { color: #666; margin-top: 0; }
+              .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1rem 0; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+              .card .title { display: block; color: #ff8c42; text-decoration: none; font-weight: 600; font-size: 1.05rem; }
+              .card .title:hover { text-decoration: underline; }
+              .card .meta { color: #999; font-size: 0.9rem; margin-top: 0.3rem; }
+              .links { margin-top: 0.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+              .links a { color: #444; text-decoration: none; font-size: 0.85rem; padding: 3px 10px; border: 1px solid #ddd; border-radius: 999px; background: #fafafa; }
+              .links a:hover { border-color: #ff8c42; color: #ff8c42; }
+            </style>
+          </head>
+          <body>
+            <h1>LE Engineering Workshops</h1>
+            <p class="sub">Claude Code ecosystem, tooling, and workflows for the Experiences vertical.</p>
+            <div class="card">
+              <a class="title" href="./workshop-02/">Workshop 02: Claude Code Ecosystem</a>
+              <div class="meta">Apr 2026 &middot; ~2h45 &middot; hooks, MCPs, skills, agents, CLAUDE.md</div>
+              <div class="links">
+                <a href="./workshop-02/">Live slides</a>
+                <a href="./workshop-02.pdf">PDF</a>
+                <a href="https://github.com/ivanhoinacki/team-exp-claude-config/tree/main/workshops/workshop-02">Source</a>
+              </div>
+            </div>
+            <p class="meta">Repo: <a href="https://github.com/ivanhoinacki/team-exp-claude-config">github.com/ivanhoinacki/team-exp-claude-config</a></p>
+          </body>
+          </html>
+          HTML
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

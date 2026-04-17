@@ -1,0 +1,118 @@
+@startuml
+skinparam backgroundColor #ffffff
+skinparam DefaultFontName Sora
+skinparam DefaultFontColor #1a1a1a
+skinparam DefaultFontSize 13
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam padding 5
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+skinparam sequence {
+    ArrowColor #d96a1f
+    ArrowFontColor #1a1a1a
+    LifeLineBorderColor #9a9a9a
+    LifeLineBackgroundColor #ffffff
+
+    ParticipantBorderColor #d96a1f
+    ParticipantBackgroundColor #fff4ec
+    ParticipantFontColor #1a1a1a
+
+    ActorBorderColor #d96a1f
+    ActorBackgroundColor #fff4ec
+    ActorFontColor #1a1a1a
+
+    BoxBorderColor #cccccc
+    BoxBackgroundColor #f7f7f7
+    BoxFontColor #1a1a1a
+
+    GroupHeaderFontColor #ffffff
+    GroupBackgroundColor #d96a1f
+    GroupBorderColor #d96a1f
+    GroupFontColor #ffffff
+    GroupBodyBackgroundColor #fafafa
+
+    DividerBackgroundColor #fff4ec
+    DividerBorderColor #d96a1f
+    DividerFontColor #d96a1f
+}
+
+skinparam note {
+    BorderColor #d96a1f
+    BackgroundColor #fff9f3
+    FontColor #3a3a3a
+}
+
+actor "Developer" as dev
+box "Copilot (Haiku)" #fff4ec
+  participant "Orchestrator" as copilot
+end box
+box "Researchers (Haiku, read-only)" #f7f7f7
+  participant "R1: Jira" as r1
+  participant "R2: Vault" as r2
+  participant "R3: Confluence" as r3
+  participant "R4: Slack" as r4
+  participant "R5: GitHub" as r5
+end box
+box "Implementer (Sonnet, read+write)" #fff4ec
+  participant "Coder" as impl
+end box
+box "Reviewer (Haiku, read-only)" #f7f7f7
+  participant "Auditor" as rev
+end box
+
+== Phase 1: Understand (Copilot, Haiku) ==
+
+dev -> copilot : "implementa EXP-3570"
+copilot -> r1 : Read Jira ticket
+r1 --> copilot : What, Why, Acceptance Criteria
+
+== Phase 2: Knowledge Base Search (5 Researchers, Haiku) ==
+
+copilot -> r1 : Jira related issues
+copilot -> r2 : query_vault("instant booking")
+copilot -> r3 : Confluence ADRs
+copilot -> r4 : Slack discussions
+copilot -> r5 : GitHub PRs + git log
+
+note over r1, r5 : **All 5 run in parallel**\nHaiku = ~85% cheaper than Opus
+
+r1 --> copilot : Related tickets
+r2 --> copilot : Pitfall: "check autoConfirm too"
+r3 --> copilot : ADR on confirmation flow
+r4 --> copilot : PM business rule thread
+r5 --> copilot : Prior PR + recent commits
+
+copilot -> copilot : Synthesize findings
+
+== Phase 3: Codebase Discovery (Researcher, Haiku) ==
+
+copilot -> r2 : Read OfferCard.tsx, PriceBadge.tsx,\noffer.ts, tests
+r2 --> copilot : Existing patterns + types
+
+== Phase 3.5: Worktree Setup (Copilot) ==
+
+copilot -> copilot : git worktree add\ncopy CLAUDE.md\nnvm use + yarn install
+
+== Phase 4: Implementation Guide (Copilot, Haiku) ==
+
+copilot --> dev : **Plan with steps, risks, diagrams**
+dev --> copilot : "Approved, add tooltip too"
+
+== Phase 5: Implementation (Implementer, Sonnet) ==
+
+copilot -> impl : Approved spec + patterns + gotchas
+activate impl
+impl -> impl : 1. Edit types\n2. Create component\n3. Write tests\n4. Run tests\n5. /deslop
+impl --> copilot : Code complete, tests pass
+deactivate impl
+
+== Phase 6: Wrap-up (Copilot + Reviewer) ==
+
+copilot -> rev : Review diff (18 dimensions)
+rev --> copilot : Findings (if any)
+copilot -> copilot : /commit + /create-pr
+copilot --> dev : PR ready with diagrams + CI monitor
+
+@enduml

@@ -1,0 +1,123 @@
+@startuml
+skinparam backgroundColor #ffffff
+skinparam DefaultFontName Sora
+skinparam DefaultFontColor #1a1a1a
+skinparam DefaultFontSize 13
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam padding 5
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+skinparam sequence {
+    ArrowColor #d96a1f
+    ArrowFontColor #1a1a1a
+    LifeLineBorderColor #9a9a9a
+    LifeLineBackgroundColor #ffffff
+
+    ParticipantBorderColor #d96a1f
+    ParticipantBackgroundColor #fff4ec
+    ParticipantFontColor #1a1a1a
+
+    ActorBorderColor #d96a1f
+    ActorBackgroundColor #fff4ec
+    ActorFontColor #1a1a1a
+
+    BoxBorderColor #cccccc
+    BoxBackgroundColor #f7f7f7
+    BoxFontColor #1a1a1a
+
+    GroupHeaderFontColor #ffffff
+    GroupBackgroundColor #d96a1f
+    GroupBorderColor #d96a1f
+    GroupFontColor #ffffff
+    GroupBodyBackgroundColor #fafafa
+
+    DividerBackgroundColor #fff4ec
+    DividerBorderColor #d96a1f
+    DividerFontColor #d96a1f
+}
+
+skinparam note {
+    BorderColor #d96a1f
+    BackgroundColor #fff9f3
+    FontColor #3a3a3a
+}
+
+skinparam database {
+    BorderColor #d96a1f
+    BackgroundColor #fff4ec
+    FontColor #1a1a1a
+}
+
+actor "Developer" as dev
+box "Copilot (Haiku)" #fff4ec
+  participant "Orchestrator" as copilot
+end box
+box "7 Researchers (Haiku, read-only)" #f7f7f7
+  participant "R1: Jira" as r1
+  participant "R2: Slack" as r2
+  participant "R3: GitHub" as r3
+  participant "R4: Confluence" as r4
+  participant "R5: Backend" as r5
+  participant "R6: Frontend" as r6
+  participant "R7: Datadog" as r7
+end box
+database "ChromaDB" as chroma
+
+== Phase 0: Scope (Copilot, Haiku) ==
+
+dev -> copilot : "investiga EXP-3580"
+copilot -> r1 : Read Jira ticket
+r1 --> copilot : Refund $45.20 instead of $50.00
+
+== Phase 0.5: Service Chain (Copilot, Haiku) ==
+
+copilot -> chroma : query_vault("refund FX rounding")
+chroma --> copilot : Pitfall: "promoAmount must\nbe propagated, not recalculated"
+copilot -> copilot : Map service chain:\ncustomer -> svc-order -> svc-experiences -> provider
+
+== Phase 1: Evidence Sweep (7 Researchers, Haiku, parallel) ==
+
+copilot -> r1 : Jira: related tickets
+copilot -> r2 : Slack: error reports, workarounds
+copilot -> r3 : GitHub: recent PRs, blame, releases
+copilot -> r4 : Confluence: ADRs, runbooks
+copilot -> r5 : Backend: grep svc-order refund.ts
+copilot -> r6 : Frontend: admin refund UI
+copilot -> r7 : Datadog: logs, traces, metrics
+
+note over r1, r7 : **All 7 run simultaneously**\n~3-5 min total (vs 2-4h manual)
+
+r1 --> copilot : EXP-3201: similar bug 3mo ago
+r2 --> copilot : 3 CS reports this week
+r3 --> copilot : PR #4521 changed refund.ts\nMath.round -> Math.floor
+r4 --> copilot : ADR: "propagate, never recalculate"
+r5 --> copilot : FX applied when currencies match\n(should be skipped)
+r6 --> copilot : Admin UI sends correct currency
+r7 --> copilot : Spike started 14 days ago\n(matches PR #4521 merge)
+
+== Phase 2: Synthesis (Copilot, Haiku) ==
+
+copilot -> copilot : Cross-reference 7 sources\nReconstruct timeline\n5 Whys root cause analysis
+
+note right of copilot
+  **Root cause**: PR #4521 removed
+  currency check condition.
+  FX now applies to same-currency
+  refunds. Confirmed by GitHub
+  diff + Datadog traces.
+  **Impact**: ~47 refunds affected.
+end note
+
+== Phase 3: Fix Plan (Copilot, Haiku) ==
+
+copilot --> dev : **2 approaches with trade-offs**\nA: Restore currency check (recommended)\nB: FX rate 1.0 for same-currency
+
+== Phase 4: Document (Copilot, Haiku) ==
+
+copilot -> chroma : Save Investigation-Case.md\n(auto-indexed in ~30s)
+
+note over chroma : Next time someone touches\nrefund.ts, query_vault returns:\n"FX only when currencies differ.\nSee EXP-3580."
+
+@enduml

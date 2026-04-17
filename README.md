@@ -146,3 +146,13 @@ Fork this repo and adapt for your team:
 - Git + GitHub CLI (`gh auth login`)
 - Atlassian API token
 - Python 3 (for vault-rag)
+
+## Workshops
+
+Engineering team workshops delivered by Ivan Hoinacki. Live slides auto-deployed on every push to `main`.
+
+| # | Title | Date | Links |
+| --- | --- | --- | --- |
+| 02 | Claude Code Ecosystem | Apr 2026 | [live slides](https://ivanhoinacki.github.io/team-exp-claude-config/workshop-02/) · [PDF](https://ivanhoinacki.github.io/team-exp-claude-config/workshop-02.pdf) · [source](./workshops/workshop-02/) |
+
+See [`workshops/`](./workshops/) for all decks.

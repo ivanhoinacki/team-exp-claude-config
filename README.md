@@ -36,6 +36,19 @@ The script preserves `~/.zshrc.local`, Git identity and existing plugin reposito
 Fonts and Ghostty are installed separately. See [Ubuntu setup](docs/UBUNTU-SETUP.md)
 and [validation and limits](docs/UBUNTU-HANDOFF.md).
 
+## Complete Ubuntu setup, including Codex
+
+```bash
+bash scripts/setup-ubuntu.sh
+```
+
+This installs the terminal dependencies and portable Claude/Codex configuration.
+It installs Codex CLI 0.159.3 if missing and preserves an existing CLI installation.
+Use `--config-only` to skip dependency and CLI installation. Codex includes 20 local
+skills, 20 portable agents, 16 Markdown instruction rules, execution rules and 9 hook
+events. Authentication is configured on the target with `codex login`; review `/hooks`
+after starting `codex --profile company`. See [Codex setup](docs/CODEX-UBUNTU.md).
+
 ## Current workflows
 
 `commit`, `create-pr`, `deslop`, `feature-dev`, `codereview`, `thinking-partner`,

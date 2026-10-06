@@ -1,0 +1,6 @@
+interface:
+  display_name: "Playwright Runner"
+  short_description: "Run Playwright through the shared runner"
+  icon_small: "./assets/playwright-small.svg"
+  icon_large: "./assets/playwright.png"
+  default_prompt: "Use $playwright to validate this browser workflow through the shared playwright-runner and report its artifacts."

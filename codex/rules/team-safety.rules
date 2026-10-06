@@ -1,0 +1,8 @@
+# Reusable execution rules; these are supplementary, not a complete security boundary.
+prefix_rule(pattern=["git", "reset", "--hard"], decision="forbidden")
+prefix_rule(pattern=["git", "checkout", "."], decision="forbidden")
+prefix_rule(pattern=["git", "add", "."], decision="forbidden")
+prefix_rule(pattern=["git", "push", "--force"], decision="forbidden")
+prefix_rule(pattern=["git", "push", "-f"], decision="forbidden")
+prefix_rule(pattern=["git", "clean"], decision="prompt")
+prefix_rule(pattern=["rm", "-rf"], decision="prompt")

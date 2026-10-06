@@ -1,0 +1,12 @@
+# Inert example. Add selected integrations through `codex mcp add`.
+# Existing runtime MCP settings are preserved by install-codex.py.
+# OAuth and credentials are configured separately on the target machine.
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["-y", "chrome-devtools-mcp@latest"]
+enabled = false
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+enabled = false

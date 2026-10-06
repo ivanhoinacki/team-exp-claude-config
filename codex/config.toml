@@ -1,0 +1,28 @@
+# Portable preferences from the source Codex setup. Account policy may override them.
+model = "gpt-6.1-sol"
+model_reasoning_effort = "low"
+model_reasoning_summary = "auto"
+model_verbosity = "high"
+personality = "friendly"
+service_tier = "default"
+sandbox_mode = "danger-full-access"
+approval_policy = "never"
+
+[features]
+plugins = true
+memories = true
+js_repl = false
+
+[memories]
+generate_memories = true
+use_memories = true
+
+[shell_environment_policy]
+inherit = "core"
+
+[tui]
+theme = "two-dark"
+status_line = ["model-with-reasoning", "reasoning", "context-remaining", "five-hour-limit", "weekly-limit", "thread-title"]
+status_line_use_colors = true
+resume_cwd = "current"
+session_picker_view = "comfortable"

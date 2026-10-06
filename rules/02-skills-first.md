@@ -1,26 +1,39 @@
 ---
-description: Always use available skills and inform which is active
+description: Quais skills existem, quando usar, e o que a medicao de uso mostra
 alwaysApply: true
 ---
 
-# Skills First
+# Skills Primeiro
 
-First response: load thinking-partner, output `Thinking Partner mode ativo.`
+Antes de dev/doc/analise: verificar se uma skill cobre. Usar.
 
-Before dev/doc/analysis: check if a skill covers it. Use it. Never skip.
-**Chaining**: invoke EACH sequentially. "comita e cria o PR" = `/commit` then `/create-pr`.
-**Intent detection**: "cria o PR" triggers `/create-pr`. "comita" triggers `/commit`.
+Carregar `thinking-partner` para conversas de analise, planejamento ou decisao. Pular
+para pergunta rapida, edicao de codigo e execucao de automacao.
 
-Skills: `/capture-knowledge` | `/codereview` | `/commit` | `/create-pr` | `/daily` | `/debug-mode` | `/deploy-checklist` | `/deslop` | `/diagrams` | `/feature-dev` | `/investigation-case` | `/learn` | `/test-scenarios` | `/thinking-partner` | `/validate-infra` | `/validate-migration`
+**Encadeamento**: a cadeia flui sem interrupcao. Nao forcar `/clear` entre skills.
+**Deteccao de intencao**: "cria o PR" dispara `/create-pr`. "comita" dispara `/commit`.
+**Commit e PR inline**: `/commit` e `/create-pr` sao guias, nao gates. Claude pode
+commitar e abrir PR direto seguindo o formato da regra 00 e o template em
+`skills/create-pr/references/pr-template.md`. Carregar a skill quando o usuario pedir
+ou quando precisar do checklist completo.
 
-| Type | Chain |
+## Skills ativas
+
+`/thinking-partner` | `/commit` | `/deslop` | `/create-pr` | `/codereview` |
+`/feature-dev` | `/handoff` | `/investigation`
+
+## Cadeias
+
+| Tipo | Cadeia |
 |---|---|
-| Feature | study -> /feature-dev -> /deslop -> /test-scenarios -> /commit -> E2E -> /create-pr -> /deploy-checklist |
-| Bug | /investigation-case -> /debug-mode -> /learn -> /deslop -> /test-scenarios -> /commit -> E2E -> /create-pr |
-| Config | study -> /validate-infra -> /commit -> /create-pr -> /deploy-checklist |
-| Migration | study -> /validate-migration -> /commit -> E2E -> /create-pr -> /deploy-checklist |
-| Troubleshoot | study Phase 1 -> resolve -> /learn |
+| Feature | `/feature-dev` -> `/deslop` -> `/commit` -> `/create-pr` |
+| Bug | `/investigation` -> corrigir -> `/deslop` -> `/commit` -> `/create-pr` |
+| Config, migration | alterar -> `/deslop` -> `/commit` -> `/create-pr` |
 
-Always start with study. Never skip /deslop before commit. Env vars changed = /validate-infra. Migration = /validate-migration. E2E mandatory before /create-pr (skip for config/docs).
+**Nunca pular `/deslop` antes do commit.** E o unico gate real da cadeia.
 
-Before commit/PR show progress: `[x]` done `[ ]` pending `[~]` skipped. /deslop `[ ]` at commit = STOP, run first.
+Antes de commit/PR mostrar progresso: `[x]` feito `[ ]` pendente `[~]` pulado.
+`/deslop` em `[ ]` no commit = PARAR e executar primeiro.
+
+
+Os workflows antigos permanecem no repositório para compatibilidade. O pacote portátil instala apenas as 8 skills ativas acima.

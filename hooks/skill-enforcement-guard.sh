@@ -1,10 +1,5 @@
 #!/bin/bash
-# PreToolUse hook: blocks git commit and gh pr create if the required skill
-# was not loaded first. Checks the state file written by skill-tracker.sh.
-#
-# Rules:
-#   git commit  -> requires /commit skill
-#   gh pr create -> requires /create-pr skill
+# PreToolUse hook: flags destructive commands. Skills are guides, not approval gates.
 #
 # Exit 0 with JSON deny = block. Exit 0 without output = allow.
 
@@ -50,35 +45,7 @@ cmd_matches() {
   return $found
 }
 
-# Check: git commit without /commit skill
-if cmd_matches '\bgit\s+commit\b'; then
-  if [ ! -f "$state_file" ] || ! grep -q "^commit$" "$state_file" 2>/dev/null; then
-    jq -n '{
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "deny",
-        permissionDecisionReason: "SKILL ENFORCEMENT: You must load the /commit skill (via Skill tool) before running git commit. The skill contains format rules, verification checklists, and quality gates. Run Skill(commit) first, then retry."
-      }
-    }'
-    exit 0
-  fi
-fi
-
-# Check: gh pr create without /create-pr skill
-if cmd_matches '\bgh\s+pr\s+create\b'; then
-  if [ ! -f "$state_file" ] || ! grep -q "^create-pr$" "$state_file" 2>/dev/null; then
-    jq -n '{
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "deny",
-        permissionDecisionReason: "SKILL ENFORCEMENT: You must load the /create-pr skill (via Skill tool) before running gh pr create. The skill includes mandatory sequence diagrams, pre-checks, and PR template. Run Skill(create-pr) first, then retry."
-      }
-    }'
-    exit 0
-  fi
-fi
-
-# git push: allowed (no escalation)
+# Commit/push approval is governed by the user and operational rule.
 
 # Check: destructive commands
 if cmd_matches '\bgit\s+reset\s+--hard\b|\brm\s+-rf\b|\bgit\s+clean\s+-f'; then
@@ -87,18 +54,6 @@ if cmd_matches '\bgit\s+reset\s+--hard\b|\brm\s+-rf\b|\bgit\s+clean\s+-f'; then
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
       permissionDecisionReason: "ESCALATION: Destructive command detected. Ask the user before proceeding. Consider safer alternatives."
-    }
-  }'
-  exit 0
-fi
-
-# Check: git checkout -b on main repos (should use worktree)
-if cmd_matches '\bgit\s+checkout\s+-b\b'; then
-  jq -n '{
-    hookSpecificOutput: {
-      hookEventName: "PreToolUse",
-      permissionDecision: "deny",
-      permissionDecisionReason: "ESCALATION: git checkout -b detected. Feature development should use git worktrees, not branches on the main checkout. Ask the user: (1) should I create a worktree with `git worktree add ../REPO--FEATURE -b BRANCH`? (2) or is this intentional on the main checkout?"
     }
   }'
   exit 0

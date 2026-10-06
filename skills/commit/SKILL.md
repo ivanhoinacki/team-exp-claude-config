@@ -2,7 +2,7 @@
 name: commit
 model: haiku
 description: Commit current work with a clean, conventional message. Use when the user says "commit", "save this", "git commit", "make the commit". Do NOT use for push (that requires separate approval).
-allowed-tools: Bash(git *)
+allowed-tools: Bash(git *), Bash(find *), Bash(cd *), Bash(ls *)
 effort: low
 ---
 
@@ -10,8 +10,63 @@ effort: low
 
 ## Working Directories
 
-1. **Obsidian workspace** (docs, plans, features): `__VAULT_ROOT__`
-2. **Codebase** (all LE services): `__CODEBASE_ROOT__`
+1. **Vault root**: `__VAULT_ROOT__`
+2. **Context root**: use the artifact destination declared by the active project, or docs/ in a neutral repository.
+3. **Codebase**: the repo you are in. Resolve with `git rev-parse --show-toplevel`.
+   Never assume a client-specific root. __USER_NAME__ works for more than one company; see rule 15
+   (`~/.claude/rules/15-client-context.md`) for how to derive client facts from the repo.
+
+## Worktree Detection (MANDATORY FIRST ACTION, before ANY git command)
+
+The cwd may be the Obsidian directory (not a git repo) or already inside a worktree. Verify before proceeding.
+
+**Step 1**: Extract ticket from conversation context (EXP-XXXX from compact summary, file paths, or branch names).
+
+**Step 2**: Find the worktree on disk:
+```bash
+TICKET="exp3644"  # lowercase, no dash
+git branch -a --list "*${TICKET}*"   # busca no repo atual, nao em raiz de cliente
+```
+
+**Step 3**: Verify it's a git repo with changes:
+```bash
+git branch --show-current && git status --short
+```
+
+**Step 4**: Use that path for ALL subsequent git commands. Prepend `cd WORKTREE_PATH &&` to every bash call.
+
+**If no worktree found**: STOP and ask the user.
+**If on master**: STOP. You are in the wrong directory.
+**NEVER run git commands without first confirming you are in the worktree.**
+
+---
+
+## Deslop Gate (MANDATORY — check BEFORE anything else)
+
+If the current branch has code changes (not docs/config only), verify /deslop was run:
+
+1. Check conversation history for a prior /deslop invocation in this session
+2. If NOT found: **STOP**. Tell the user:
+   ```
+   /deslop not run yet. Run /deslop first? (yes / skip for docs-only)
+   ```
+3. Only proceed if user confirms skip (docs/config only) or /deslop was already run
+
+---
+
+## Pre-commit Check (lightweight, no tests)
+
+Quick sanity checks only. Full CI validation (lint, types, build, tests) happens in /create-pr.
+
+**All commands below use the worktree path from Step 2 above.** Never run bare `git` without `cd WORKTREE_PATH &&`.
+
+```bash
+cd WORKTREE_PATH && git branch --show-current  # Must NOT be main/master
+cd WORKTREE_PATH && GIT_EDITOR=true git diff --stat
+cd WORKTREE_PATH && GIT_EDITOR=true git diff | grep -iE "(api.key|secret|token|password|private.key)" | head -5
+```
+
+---
 
 ## Process
 
@@ -19,33 +74,15 @@ effort: low
    - If on `main` or `master`: **NEVER commit directly**. Analyze the diff to suggest a smart branch name:
      1. Run `GIT_EDITOR=true git diff --stat` to see changed files
      2. Infer **type** from changes:
-        - New files with business logic → `feat`
-        - Modified existing logic fixing a defect → `fix`
-        - Only test files → `test`
-        - Only config/CI/deps → `chore`
-        - Only `.md` files → `docs`
-        - Restructuring without behavior change → `refactor`
-        - Performance-related changes → `perf`
-     3. Infer **scope** from file paths:
-        - `svc-experiences/...` → `svc-experiences`
-        - `www-le-customer/...` → `www-le-customer`
-        - `src/checkout/...` → `checkout`
-        - Multiple services → use the primary one or the shared module name
-     4. Infer **description** from the nature of changes (function names, file names, test names)
-     5. Present to user with context:
-
-        ```
-        You are on main. Based on the diff:
-        - Type: feat (new files with business logic)
-        - Scope: svc-experiences (all changed files)
-        - Suggestion: feat/svc-experiences-add-complementary-filter
-
-        Use this branch or prefer a different name?
-        ```
-
-     6. Wait for the user's response before creating the branch with `git checkout -b <name>`
-
-   - If no branch exists (detached HEAD): analyze the diff and suggest a branch name before committing
+        - New files with business logic -> `feat`
+        - Modified existing logic fixing a defect -> `fix`
+        - Only test files -> `test`
+        - Only config/CI/deps -> `chore`
+        - Only `.md` files -> `docs`
+        - Restructuring without behavior change -> `refactor`
+        - Performance-related changes -> `perf`
+     3. Infer **scope** from file paths (e.g., `svc-experiences`, `www-le-customer`)
+     4. Present suggestion and wait for user response
 
 2. Review changed files: `GIT_EDITOR=true git diff --stat`
 3. Check each file is related to the current work (don't commit unrelated changes)
@@ -79,29 +116,29 @@ The service or module affected (e.g., `svc-experiences`, `checkout`, `auth`, `in
 
 ### Rules
 
-- Title under 80 characters. Why: longer titles get truncated in `git log --oneline` and GitHub PR lists, losing context.
-- No Co-authored-by, Signed-off-by, Made-with, Made-with: Cursor, or any trailers unless user asks. Why: both Claude Code and Cursor CLI auto-add trailers (`Co-Authored-By`, `Made-with: Cursor`) by default, which pollutes git history and conflicts with the team's commit conventions. This rule overrides those system defaults.
-- **Cursor CLI trailer injection**: Cursor CLI intercepts every `git commit` and appends `Made-with: Cursor` automatically. There is no way to prevent this from inside the Cursor session. **Post-commit cleanup**: after every commit, run `git log -1 --format="%B"` to check for trailers, then strip them with: `git log -1 --format="%B" | grep -v "^Made-with:" | grep -v "^Co-Authored-By:" > /tmp/clean-msg.txt && GIT_EDITOR="cp /tmp/clean-msg.txt" git commit --amend --allow-empty`. If the amend also re-injects the trailer, warn the user to run the amend from a terminal outside Cursor.
-- Only commit when instructed. Why: premature commits create noise in the branch history and the user may still be iterating on the changes.
-- If `git diff` fails, use working memory of what changed.
-- Prepend `GIT_EDITOR=true` to all git commands. Why: prevents git from opening an interactive editor which blocks the CLI session indefinitely.
-- After commit, ask if user wants to push (only if not on main). Why: pushing is an external action with side-effects (triggers CI, notifies reviewers) and requires explicit user intent.
+- Title under 80 characters
+- No Co-authored-by, Signed-off-by, Made-with, Made-with: Cursor, or any trailers unless user asks
+- **Cursor CLI trailer injection**: after every commit, run `git log -1 --format="%B"` to check for trailers, then strip them with: `git log -1 --format="%B" | grep -v "^Made-with:" | grep -v "^Co-Authored-By:" > /tmp/clean-msg.txt && GIT_EDITOR="cp /tmp/clean-msg.txt" git commit --amend --allow-empty`
+- Only commit when instructed
+- Prepend `GIT_EDITOR=true` to all git commands
+- After commit, ask if user wants to push (only if not on main)
 
 ## Common Agent Mistakes
 
-1. **Committing unrelated changes**: Not checking if ALL staged files are related to the current work. Always review `git diff --stat` before committing. Why: mixed commits make `git bisect` and `git revert` unreliable.
-2. **Adding trailers**: Both Claude Code and Cursor CLI try to add trailers (`Co-Authored-By`, `Made-with: Cursor`). This rule overrides that. Never add trailers unless user explicitly asks. Why: the team's convention is clean commit messages; trailers add noise and were flagged in past PR reviews.
-3. **Committing secrets**: Not checking for `.env`, credentials, tokens, or API keys in the staged files. Always scan for sensitive content. Why: secrets in git history require credential rotation and are a security incident.
-4. **Vague commit messages**: Writing "update code" or "fix bug" instead of describing WHAT changed and WHY. Why: vague messages make git blame useless for future investigators.
-5. **Using git add -A**: Staging everything including untracked files. Always stage specific files by name. Why: `git add -A` can accidentally include `.env`, `node_modules` artifacts, or unrelated work-in-progress files.
+1. **Running git in Obsidian directory**: After compact, cwd is ALWAYS Obsidian (not a git repo). You MUST find and cd to the worktree FIRST. Running bare `git branch` or `git diff` without `cd WORKTREE &&` will fail with "not a git repository".
+2. **Committing unrelated changes**: Always review `git diff --stat` before committing
+3. **Adding trailers**: Never add trailers unless user explicitly asks
+4. **Committing secrets**: Always scan for sensitive content
+5. **Vague commit messages**: Describe WHAT changed and WHY
+6. **Using git add -A**: Always stage specific files by name
 
 ## Verification (MANDATORY before committing)
 
 ```
-- [ ] Branch is NOT main/master: `git branch --show-current`
-- [ ] Node version matches .nvmrc: `node -v` vs `cat .nvmrc` (pre-commit hooks fail on mismatch, run `nvm use` first)
-- [ ] All staged files are related to current work: `GIT_EDITOR=true git diff --cached --name-only`
-- [ ] No secrets in staged files: `GIT_EDITOR=true git diff --cached | grep -iE "(api.key|secret|token|password|private.key)" | head -5`
+- [ ] Deslop gate passed (or skipped for docs-only)
+- [ ] Branch is NOT main/master
+- [ ] All staged files are related to current work
+- [ ] No secrets in staged files
 - [ ] Commit message follows format: <type>(<scope>): <description>
-- [ ] No trailers added (Co-Authored-By, Signed-off-by, Made-with: Cursor)
+- [ ] No trailers added
 ```

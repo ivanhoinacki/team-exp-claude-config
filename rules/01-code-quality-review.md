@@ -1,14 +1,32 @@
 ---
-description: Priority code quality rule. Apply DURING development, not just before PR.
+description: Regra prioritária de qualidade de código. Aplicar DURANTE o desenvolvimento, não só antes do PR.
 alwaysApply: true
 ---
 
-# Code Quality Review
+# Revisão de Qualidade de Código
 
-18 dimensions per function/module:
-**Critical** (blocks merge): Correctness, Security, Performance, Error Handling, Cross-Service Contract, Financial Integrity
-**High** (fix before merge): SOLID, Testing, Codebase Consistency, Architecture/DDD, Idempotency, Data Visibility, Runtime Config, External System Trust
-**Medium**: Observability, Concurrency, Documentation, Dependencies
+18 dimensões por função/módulo (ver skill `/codereview` para a lista oficial e níveis de severidade).
 
-Before push: correctness? security? perf? contracts? financial? tests? patterns? env vars?
-Before PR: run `/deslop`. Gotchas in `pitfalls*.md`.
+Antes do push: corretude? segurança? performance? contratos? financeiro? testes? padrões? env vars?
+Antes do PR: executar `/deslop`. Armadilhas em `pitfalls*.md`.
+
+## Captura de Aprendizado ao Aplicar Comentários de PR (OBRIGATÓRIO)
+
+Ao aplicar QUALQUER comentário de review de PR (reviewer humano, bot, ou outra instância de AI), independente da skill ativa:
+
+1. Corrigir o código.
+2. Avaliar se o comentário expõe padrão reutilizável: convenção do repo, regra escondida, constraint de negócio, preferência do reviewer, gap de validação.
+3. Se sim: append em `~/.claude/skills/codereview/references/learnings.md` E salvar feedback entry na memória do copilot.
+4. Se afeta como reviews futuras devem checar código: atualizar também `~/.claude/skills/codereview/references/known-gotchas.md`.
+
+Objetivo: feedback de review vira input de reviews futuras, não fix pontual. Pular este passo = repetir o mesmo erro.
+
+## Reuso dos Aprendizados (OBRIGATÓRIO antes de escrever código)
+
+Antes de escrever ou alterar código em qualquer repo de trabalho (com ou sem skill ativa):
+
+- Checar `~/.claude/skills/codereview/references/known-gotchas.md` nas seções que casam com o domínio do change (input parsing, queries, financial, flags, async, provider sync).
+- Scan rápido de `~/.claude/skills/codereview/references/learnings.md` por entradas do repo/serviço alvo. Entradas são indexadas por cliente e repo: não aplicar aprendizado de um cliente em outro sem checar se a convenção é a mesma.
+- Consumidores formais: /feature-dev (references), /codereview (Phase 0). Fora de skill, aplicar manualmente.
+
+Ciclo completo: comentário de PR -> fix -> captura (learnings/gotchas/memória) -> reuso no próximo dev/review.

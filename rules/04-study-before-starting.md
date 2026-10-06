@@ -1,36 +1,52 @@
 ---
-description: Discovery phase before any development activity
+description: Fase de descoberta antes de qualquer atividade de desenvolvimento
 alwaysApply: true
 ---
 
-# Study Before Starting
+# Estudar Antes de Começar
 
-## Phase 0: Environment (code tasks)
+Vale para qualquer empresa. O que muda por cliente (qual base de conhecimento, qual
+tracker, quais fontes) fica na camada de contexto, em `~/.claude/contexts/<slug>.md`,
+carregada pelo `CLAUDE.md` do projeto.
 
-Check Docker running, `nvm use`, node_modules present.
+## Fase 0: Ambiente
 
-## Phase 0.5: Vault RAG (MANDATORY, BEFORE any Read/Grep)
+Verificar runtime disponível, dependências instaladas, serviços de apoio no ar.
+O como é específico do projeto e está no `CLAUDE.md` dele.
 
-You MUST call `query_vault(query, service_filter)` BEFORE reading codebase files or external sources for any LE-related task. This is enforced by hook. No exceptions.
+## Fase 1: Base de conhecimento primeiro
 
-## Phase 1: Domain Routing
+Se o contexto ativo declara uma base de conhecimento (RAG, wiki, pasta de docs),
+consultá-la ANTES de ler arquivo, antes de grep, antes de git log, antes de fonte
+externa. Esgotar o domínio antes de tentativa e erro.
 
-DB/access -> pitfalls-infra, Test-Simulation | AWS/IAM -> cli/USAGE, pitfalls-infra | CI -> CI-Checks-Reference | Provider -> Business-Rules/Providers, Provider-Patterns | Bug -> Bug-Triaging, Ecosystem, Business-Rules, Datadog | Multi-service -> Experiences-Ecosystem, Business-Rules/Orders | Promo/refund -> Business-Rules/Refunds, Promos, pitfalls-orders
+Sem base declarada, começar pelo código e pelo histórico do git.
 
-Exhaust domain sources BEFORE trial-and-error.
+## Fase 2: Regras de negócio
 
-## Phase 1.5: Business Rules (MANDATORY before code)
+Comportamento financeiro, de cobrança, de permissão ou de conformidade nunca se deduz
+do código. Procurar a regra escrita. Não achou: perguntar, não inferir.
 
-Read relevant `Knowledge-Base/Business-Rules/`. Does this rule affect implementation?
+## Fase 3: Contexto e arte prévia
 
-## Phase 2-3: Context + Prior Art
+Ordem: base de conhecimento -> memória -> codebase -> histórico do git -> PRs
+anteriores -> documentação -> chat.
 
-Memory/Vault -> CLI docs -> Codebase -> Git history -> GitHub PRs -> Confluence -> Slack.
+Procurar quem já resolveu isso antes de resolver de novo.
 
-## Ad-hoc Questions
+## Fase 4: Aprendizados acumulados
 
-ANY LE question: query_vault first, then pitfalls, Review-Learnings, Business-Rules.
+Antes de escrever ou alterar código:
 
-ctx% > 60% -> suggest `/compact`.
+- `~/.claude/skills/codereview/references/known-gotchas.md`, nas seções que casam com o
+  domínio do change
+- `~/.claude/skills/codereview/references/learnings.md`, entradas do repo alvo
 
-CI: `yarn lint && yarn test:types && yarn build && yarn test:unit`
+Consumidores formais: `/feature-dev` (references) e `/codereview` (Phase 0).
+Fora de skill, aplicar manualmente. Esta regra e a fase de pesquisa: nao depende de skill.
+
+## Compactação
+
+Auto-compact LIGADO. O harness compacta perto do limite e os hooks `PreCompact`/
+`PostCompact` anunciam antes e depois. Não pedir `/clear` nem rodar `/compact` manual em
+silêncio. Skills rodam com o contexto disponível.

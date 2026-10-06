@@ -20,6 +20,12 @@ fail() { echo -e "${RED}  FAIL${NC} $1"; FAIL=$((FAIL + 1)); }
 warn() { echo -e "${YELLOW}  WARN${NC} $1"; WARN=$((WARN + 1)); }
 header() { echo -e "\n${BOLD}=== $1 ===${NC}\n"; }
 
+# Portable installs verify their exact exported inventory without touching integrations.
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "${CLAUDE_HOME:-$HOME}/.claude/.portable-config.json" ]; then
+  exec python3 "$SCRIPT_DIR/install-config.py" --target-home "${CLAUDE_HOME:-$HOME}" --verify
+fi
+
 # --- Prerequisites ---
 header "1. Prerequisites"
 
@@ -31,23 +37,23 @@ command -v python3 &>/dev/null && pass "python3 installed ($(python3 --version 2
 command -v uvx &>/dev/null && pass "uvx installed" || warn "uvx not found (run: curl -LsSf https://astral.sh/uv/install.sh | sh)"
 
 # --- Rules ---
-header "2. Rules (expect 8)"
+header "2. Rules (expect 16)"
 
 RULES_DIR="$HOME/.claude/rules"
-EXPECTED_RULES=("00-global-style.md" "01-code-quality-review.md" "02-skills-first.md" "03-escalation-protocol.md" "04-study-before-starting.md" "05-diagrams-standard.md" "06-worktree-detection.md" "08-behavioral-standards.md")
+EXPECTED_RULES=("00-global-style.md" "01-code-quality-review.md" "02-skills-first.md" "03-operational-protocol.md" "04-study-before-starting.md" "05-diagrams-standard.md" "06-worktree-detection.md" "07-agent-model-defaults.md" "08-browser-mcp-terminal-failure.md" "10-session-data-handling.md" "11-output-budget.md" "12-multi-agent-handoff.md" "13-debugging-evidence-first.md" "14-secrets-handling.md" "15-client-context.md" "16-obsidian-vault-writing.md")
 
 for rule in "${EXPECTED_RULES[@]}"; do
   [ -f "$RULES_DIR/$rule" ] && pass "$rule" || fail "$rule missing"
 done
 
 RULE_COUNT=$(ls "$RULES_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
-[ "$RULE_COUNT" -ge 8 ] && pass "Total: $RULE_COUNT rules" || fail "Expected 8+ rules, found $RULE_COUNT"
+[ "$RULE_COUNT" -ge 16 ] && pass "Total: $RULE_COUNT rules" || fail "Expected 16+ rules, found $RULE_COUNT"
 
 # --- Skills ---
-header "3. Skills (expect 16)"
+header "3. Skills (expect 18)"
 
 SKILLS_DIR="$HOME/.claude/skills"
-EXPECTED_SKILLS=("capture-knowledge" "codereview" "commit" "create-pr" "daily" "debug-mode" "deploy-checklist" "deslop" "diagrams" "feature-dev" "investigation-case" "learn" "test-scenarios" "thinking-partner" "validate-infra" "validate-migration")
+EXPECTED_SKILLS=("capture-knowledge" "codereview" "commit" "create-pr" "daily" "debug-mode" "deploy-checklist" "deslop" "diagrams" "feature-dev" "investigation-case" "investigation" "handoff" "learn" "test-scenarios" "thinking-partner" "validate-infra" "validate-migration")
 
 for skill in "${EXPECTED_SKILLS[@]}"; do
   if [ -d "$SKILLS_DIR/$skill" ] && [ -f "$SKILLS_DIR/$skill/SKILL.md" ]; then
@@ -61,7 +67,7 @@ SKILL_COUNT=0
 for d in "$SKILLS_DIR"/*/; do
   [ -f "$d/SKILL.md" ] && SKILL_COUNT=$((SKILL_COUNT + 1))
 done
-[ "$SKILL_COUNT" -ge 16 ] && pass "Total: $SKILL_COUNT skills with SKILL.md" || fail "Expected 16+ skills, found $SKILL_COUNT"
+[ "$SKILL_COUNT" -ge 18 ] && pass "Total: $SKILL_COUNT skills with SKILL.md" || fail "Expected 18+ skills, found $SKILL_COUNT"
 
 # --- Agents ---
 header "4. Agents (expect 4)"
@@ -89,7 +95,6 @@ for hook in "${EXPECTED_HOOKS[@]}"; do
   fi
 done
 
-[ -f "$HOME/.claude/statusline-command.sh" ] && pass "statusline-command.sh" || fail "statusline-command.sh missing"
 
 # --- Settings ---
 header "6. Settings"
@@ -99,7 +104,7 @@ if [ -f "$SETTINGS" ]; then
   pass "settings.json exists"
 
   python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'hooks' in d" 2>/dev/null && pass "hooks configured" || fail "hooks missing from settings.json"
-  python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'statusLine' in d" 2>/dev/null && pass "statusLine configured" || fail "statusLine missing from settings.json"
+  python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'hooks' in d" 2>/dev/null && pass "settings readable" || fail "settings invalid"
   python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'PreToolUse' in d['hooks']" 2>/dev/null && pass "PreToolUse hooks present" || fail "PreToolUse hooks missing"
   python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'PostToolUse' in d['hooks']" 2>/dev/null && pass "PostToolUse hooks present" || warn "PostToolUse hooks missing (skill tracker)"
   python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'SessionStart' in d['hooks']" 2>/dev/null && pass "SessionStart hooks present" || fail "SessionStart hooks missing"
@@ -113,14 +118,14 @@ else
 fi
 
 # --- MCP Servers ---
-header "7. MCP Servers (expect 7 base + optional local-le-chromadb)"
+header "7. MCP Servers (expect 6 base + optional local-le-chromadb)"
 
 MCP_FILE="$HOME/.claude.json"
 if [ -f "$MCP_FILE" ]; then
   pass ".claude.json exists"
 
   # 7 base MCPs always installed
-  BASE_MCPS=("mcp-atlassian" "datadog-mcp" "context7" "probe" "playwright" "chrome-devtools" "imugi")
+  BASE_MCPS=("mcp-atlassian" "datadog-mcp" "context7" "probe" "chrome-devtools" "imugi")
   for mcp in "${BASE_MCPS[@]}"; do
     python3 -c "import json; d=json.load(open('$MCP_FILE')); assert '$mcp' in d.get('mcpServers',{})" 2>/dev/null && pass "$mcp configured" || fail "$mcp missing"
   done
@@ -131,7 +136,7 @@ if [ -f "$MCP_FILE" ]; then
     || warn "local-le-chromadb not configured (Local AI disabled, expected if you skipped it)"
 
   MCP_COUNT=$(python3 -c "import json; d=json.load(open('$MCP_FILE')); print(len(d.get('mcpServers',{})))" 2>/dev/null)
-  [ "$MCP_COUNT" -ge 7 ] && pass "Total: $MCP_COUNT MCP servers" || fail "Expected 7+ MCP servers, found $MCP_COUNT"
+  [ "$MCP_COUNT" -ge 6 ] && pass "Total: $MCP_COUNT MCP servers" || fail "Expected 6+ MCP servers, found $MCP_COUNT"
 else
   fail ".claude.json not found"
 fi

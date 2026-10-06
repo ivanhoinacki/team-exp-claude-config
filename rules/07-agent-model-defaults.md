@@ -1,28 +1,45 @@
 ---
-description: Default model for every Agent tool call
+description: Modelo padrão para toda chamada do Agent tool
 alwaysApply: true
 ---
 
-# Agent Model Defaults
+# Padrões de Modelo para Agentes
 
-EVERY Agent tool call MUST include the `model` parameter. No exceptions.
+TODA chamada do Agent tool DEVE incluir o parâmetro `model`. Sem exceções.
 
-## Subagent type mapping
+## Mapeamento de tipo de subagente
 
 | subagent_type | model |
 |---|---|
-| Explore, researcher, reviewer, general-purpose, claude-code-guide, copilot, (empty) | **haiku** |
+| Explore, researcher, reviewer, general-purpose, claude-code-guide, copilot, (vazio) | **haiku** |
 | implementer, Plan | **sonnet** |
-| any (when user explicitly requests opus) | **opus** |
+| qualquer (quando usuário solicita opus explicitamente) | **opus** |
+| qualquer (quando usuário solicita fable explicitamente) | **fable** |
 
-Default = haiku. Missing model = bug. Hook `agent-model-guard.sh` enforces this as safety net but should never trigger.
+Padrão = haiku. Model ausente = bug. Hook `agent-model-guard.sh` garante isso como rede de segurança, mas nunca deveria disparar.
 
-## Skill model mapping
+## Quando usar Fable
 
-Skills define their model via frontmatter `model:` field. This changes the session model when the skill is invoked.
+Fable 5 e otimizado para tarefas complexas e de longa duracao. Indicado para:
+- Investigations profundas com muitos arquivos
+- Feature-dev com contexto extenso
+- Reviews pesados (muitos diffs)
+- Refactors que tocam muitos modulos
 
-| Model | Skills |
+NAO usar automaticamente. Apenas quando __USER_NAME__ solicitar explicitamente ou trocar via `/model fable`.
+
+## Mapeamento de modelo por skill
+
+Skills definem seu modelo via campo `model:` no frontmatter. Isso muda o modelo da sessão quando a skill é invocada.
+
+| Modelo | Skills |
 |---|---|
-| **haiku** (14) | automations, capture-knowledge, commit, create-pr, daily, datadog-pup-cli, deploy-checklist, diagrams, learn, migrate-newrelic-resources-to-datadog, migrate-newrelic-to-datadog, test-scenarios, thinking-partner, validate-infra, validate-migration |
-| **sonnet** (3) | codereview, debug-mode, feature-dev |
-| **opus** (2) | deslop, investigation-case |
+| **haiku** (2) | commit, create-pr |
+| **sonnet** (3) | codereview, feature-dev, handoff |
+| **opus** (3) | deslop, investigation, thinking-partner |
+| **fable** | (nenhuma por padrao, disponivel sob demanda) |
+
+Atualizada em 28/08/2026 (itens 2.2 e 4.1 do plano): removidas 6 skills que nao existem
+mais no disco e incluidas handoff e investigation com modelo declarado. A skill de daily
+saiu por decisao D2. Nomes sem crase de proposito: o lint acusa referencia em crase a
+skill morta.

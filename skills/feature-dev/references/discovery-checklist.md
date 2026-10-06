@@ -1,19 +1,19 @@
 # Discovery Checklist (Feature Development)
 
-> Parent skill: [feature-dev/SKILL.md](../SKILL.md), Phases 2 & 3
+> Parent skill: [feature-dev/SKILL.md](../SKILL.md) — Phases 2 & 3
 
 ## Phase 2: Knowledge Base & Context Search
 
 Search the company knowledge base BEFORE any planning. This includes local KB mirror, Confluence (via MCP), Slack, and GitHub PRs.
 
-### 2.0 LE Vault RAG (MCP `local-le-chromadb`), FIRST
+### 2.0 LE Vault RAG (MCP `local-le-vault`) — FIRST
 
 Indexed semantic store (Chroma collection `le-vault`): review learnings, business rules, service dossiers, runbooks, pitfalls, troubleshooting.
 
 **Always run this before 2.1–2.4** when the MCP is available:
 
-1. **`query_vault`**, Natural language query using feature keywords, ticket id, and domain terms. Set **`service_filter`** when the repo or service is known (e.g. `svc-experiences`, `svc-order`). Optionally set **`type_filter`** (e.g. `business-rule`, `review-learning`, `runbook`) to narrow results.
-2. **`list_vault_sources`**, If unsure which filters apply, list indexed types and top services, then refine `query_vault`.
+1. **`query_vault`** — Natural language query using feature keywords, ticket id, and domain terms. Set **`service_filter`** when the repo or service is known (e.g. `svc-experiences`, `svc-order`). Optionally set **`type_filter`** (e.g. `business-rule`, `review-learning`, `runbook`) to narrow results.
+2. **`list_vault_sources`** — If unsure which filters apply, list indexed types and top services, then refine `query_vault`.
 
 **Zero useful hits?** Broaden the query or retry with terminology aliases (see 2.1) before relying only on grep or Confluence.
 
@@ -36,7 +36,7 @@ Use ALL aliases in every search below.
 ### 2.2 Local KB Mirror
 
 ```
-__VAULT_ROOT__/Knowledge-Base/Confluence/
+__VAULT_ROOT__/Luxury-Escapes/Knowledge-Base/Confluence/
 ├── PE-Experiences/              # 343 docs
 └── ENGX-Engineering-Excellency/ # 204 docs
 ```
@@ -56,29 +56,27 @@ Also check: `Processing/Technical-Knowledge-Collection.md`
 
 **How to search:**
 
-Use Grep tool with pattern `TERM` (replace with each alias), path `__VAULT_ROOT__/Knowledge-Base/Confluence/`, output mode `files_with_matches`.
+Use Grep tool with pattern `TERM` (replace with each alias), path `__VAULT_ROOT__/Luxury-Escapes/Knowledge-Base/Confluence/`, output mode `files_with_matches`.
 
 ### 2.3 Confluence (via MCP, beyond local mirror)
 
-Search across ALL relevant Confluence spaces, not just PE. Use the tiered space list from `investigation-case/SKILL.md` Phase 0.5:
-
-- **Tier 1 (ALWAYS)**: PE, TEC, ENGX
-- **Tier 2 (when feature crosses teams)**: OE, HOT, WHI, LOYAL, TOUR
-- **Tier 3 (broader context)**: GX, BMP, PROD, SO, DH, CS, DATA
+Search the wiki/docs source the **active client context declares** (no context, no
+declared source: skip this step). Space or section lists are client-specific and live in
+`~/.claude/contexts/<slug>.md`, not here. (Tier lists removed 28/08: they referenced the
+retired investigation skill and hardcoded one client.)
 
 **Minimum**: 3 queries across Tier 1 spaces using terminology aliases. For every relevant result, read the full page (not just the search snippet). Follow links to related pages.
 
 **MCP tools to use:**
 
-- `mcp__mcp-atlassian__confluence_search` with query including space key
-- `mcp__mcp-atlassian__confluence_get_page` to read full pages from search results
+- the client's wiki/docs search, if the active context declares one
+- read the full page from that search results
 
 ### 2.4 Slack Context
 
-Search for prior discussions about this feature area. Use channel tiers from `investigation-case/SKILL.md` Phase 0.5:
-
-- **Tier 1 (ALWAYS)**: `#team-experiences-pt-br`, `#svc-experiences`, `#007-exp`
-- **Tier 2 (when crossing teams)**: `#team-customer-payments`, `#team-bundles`, service-specific channels
+Search prior discussions in the chat channels the **active client context declares**
+(none declared: skip). Channel lists are client-specific and live in the context layer.
+(Tier lists removed 28/08: same dead reference as above.)
 
 **Minimum**: 2 keyword queries using terminology aliases. Read any relevant threads fully (not just snippets).
 
@@ -111,27 +109,27 @@ Analyze the actual codebase to understand existing patterns.
 
 | Service         | Path                                       | Architecture                                           |
 | --------------- | ------------------------------------------ | ------------------------------------------------------ |
-| svc-experiences | ~/Documents/LuxuryEscapes/svc-experiences/ | API -> Context -> Providers -> Queries (TypeORM, PostGIS) |
-| svc-car-hire    | ~/Documents/LuxuryEscapes/svc-car-hire/    | API -> Context -> Services (Prisma, BullMQ)              |
-| svc-ee-offer    | ~/Documents/LuxuryEscapes/svc-ee-offer/    | API -> Operations -> Models (Sequelize, Salesforce)      |
-| svc-occasions   | ~/Documents/LuxuryEscapes/svc-occasions/   | API -> Contexts -> Clients (Prisma, Express 5)           |
-| www-le-customer | ~/Documents/LuxuryEscapes/www-le-customer/ | React 19, Redux, styled-components                     |
+| svc-experiences | `$(git rev-parse --show-toplevel)`svc-experiences/ | API -> Context -> Providers -> Queries (TypeORM, PostGIS) |
+| svc-car-hire    | `$(git rev-parse --show-toplevel)`svc-car-hire/    | API -> Context -> Services (Prisma, BullMQ)              |
+| svc-ee-offer    | `$(git rev-parse --show-toplevel)`svc-ee-offer/    | API -> Operations -> Models (Sequelize, Salesforce)      |
+| svc-occasions   | `$(git rev-parse --show-toplevel)`svc-occasions/   | API -> Contexts -> Clients (Prisma, Express 5)           |
+| www-le-customer | `$(git rev-parse --show-toplevel)`www-le-customer/ | React 19, Redux, styled-components                     |
 
 ### 3.2 Discover patterns (run for each target service)
 
-1. **Project structure:** Bash `ls ~/Documents/LuxuryEscapes/SERVICE/src/`
+1. **Project structure:** Bash `ls src/`
 
-2. **Similar features:** Grep tool, pattern `DOMAIN_TERM`, path `~/Documents/LuxuryEscapes/SERVICE/src/`, glob `*.ts`, output `files_with_matches`
+2. **Similar features:** Grep tool — pattern `DOMAIN_TERM`, path `src/`, glob `*.ts`, output `files_with_matches`
 
-3. **Test patterns:** Glob tool, pattern `**/*.test.ts` in `SERVICE/src/`, filter for FEATURE_AREA. Read 1-2 files
+3. **Test patterns:** Glob tool — pattern `**/*.test.ts` in `SERVICE/src/`, filter for FEATURE_AREA. Read 1-2 files
 
-4. **Validation patterns:** Grep tool, pattern `joi|zod|strummer|schema`, path `SERVICE/src/`, output `files_with_matches`, head_limit 5
+4. **Validation patterns:** Grep tool — pattern `joi|zod|strummer|schema`, path `SERVICE/src/`, output `files_with_matches`, head_limit 5
 
-5. **Error handling:** Grep tool, pattern `throw|AppError|HttpError|createError`, path `SERVICE/src/`, glob `*.ts`, output `files_with_matches`, head_limit 5
+5. **Error handling:** Grep tool — pattern `throw|AppError|HttpError|createError`, path `SERVICE/src/`, glob `*.ts`, output `files_with_matches`, head_limit 5
 
-6. **Config patterns:** Glob tool, patterns `**/config*` and `**/schema.ts` in `SERVICE/src/`
+6. **Config patterns:** Glob tool — patterns `**/config*` and `**/schema.ts` in `SERVICE/src/`
 
-7. **Existing CLAUDE.md or .cursorrules:** Read tool, `~/Documents/LuxuryEscapes/SERVICE/CLAUDE.md` (auto-loaded, but read manually if in agent context)
+7. **Existing CLAUDE.md or .cursorrules:** Read tool — `$(git rev-parse --show-toplevel)`SERVICE/CLAUDE.md` (auto-loaded, but read manually if in agent context)
 
 ### 3.3 Discovery Checklist
 

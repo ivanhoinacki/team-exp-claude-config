@@ -25,7 +25,7 @@ CONFIG_FILE="${HOME}/.claude/.team-config.json"
 VERSION_FILE="${HOME}/.claude/.team-config-version"
 
 # Check first install
-if [ ! -f "$CONFIG_FILE" ]; then
+if [ ! -f "$CONFIG_FILE" ] && [ ! -f "${HOME}/.claude/.portable-config.json" ]; then
   echo -e "${RED}No existing installation found.${NC}"
   echo -e "Run ${CYAN}bash scripts/setup.sh${NC} for first-time setup."
   exit 1
@@ -40,7 +40,12 @@ echo ""
 echo -e "${CYAN}Pulling latest...${NC}"
 cd "$REPO_ROOT"
 BEFORE=$(git rev-parse HEAD)
-git pull --ff-only origin main 2>&1 || {
+UPDATE_BRANCH=$(git branch --show-current)
+if [ -z "$UPDATE_BRANCH" ]; then
+  echo "Detached checkout: clone the requested branch before updating."
+  exit 1
+fi
+git pull --ff-only origin "$UPDATE_BRANCH" 2>&1 || {
   echo -e "${RED}Pull failed. Resolve conflicts manually, then re-run.${NC}"
   exit 1
 }
@@ -64,16 +69,16 @@ else
 fi
 
 # Forward flags
-EXTRA_FLAGS=""
+EXTRA_FLAGS=()
 for arg in "$@"; do
   case "$arg" in
-    --reconfigure) EXTRA_FLAGS="--reconfigure" ;;
+    --reconfigure|--config-only) EXTRA_FLAGS+=("$arg") ;;
   esac
 done
 
 # Detect platform and run the correct setup script
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  bash "$REPO_ROOT/scripts/setup.sh" $EXTRA_FLAGS
+  bash "$REPO_ROOT/scripts/setup.sh" "${EXTRA_FLAGS[@]}"
 else
-  bash "$REPO_ROOT/scripts/setup-wsl.sh" $EXTRA_FLAGS
+  bash "$REPO_ROOT/scripts/setup-wsl.sh" "${EXTRA_FLAGS[@]}"
 fi

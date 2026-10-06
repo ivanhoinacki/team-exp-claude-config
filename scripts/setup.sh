@@ -30,6 +30,11 @@ VERSION_FILE="$CLAUDE_HOME/.claude/.team-config-version"
 BACKUP_DIR="$CLAUDE_HOME/.claude/.setup-backup-$(date +%Y%m%d-%H%M%S)"
 REPO_VERSION=$(git -C "$REPO_ROOT" describe --tags --always 2>/dev/null || echo "dev")
 
+# Portable instruction-only installation, without MCPs, credentials or dependencies.
+if [[ " ${*} " == *" --config-only "* ]]; then
+  exec python3 "$SCRIPT_DIR/install-config.py" --target-home "$CLAUDE_HOME"
+fi
+
 # --- Parse flags ---
 RECONFIGURE=false
 FORCE=false
@@ -376,7 +381,7 @@ if [ "$SETUP_TEST_MODE" != "1" ]; then
     echo "    Name:          $USER_FULL_NAME"
     echo "    Email:         $USER_EMAIL"
     echo "    Slack ID:      $SLACK_USER_ID"
-    echo "    Token:         ${ATLASSIAN_TOKEN:0:8}..."
+    echo "    Token:         ${#ATLASSIAN_TOKEN} characters (value hidden)"
     echo "    Codebase:      $CODEBASE_ROOT"
     echo "    Vault:         $VAULT_ROOT"
     echo "    Slack DM:      ${SLACK_DM_ID}"
@@ -469,6 +474,12 @@ phase_ok "backup"
 # ============================================================================
 print_header "Phase 2: Rules"
 mkdir -p "$CLAUDE_HOME/.claude/rules"
+for retired_rule in 03-escalation-protocol.md 08-behavioral-standards.md; do
+  if [ -f "$CLAUDE_HOME/.claude/rules/$retired_rule" ]; then
+    mkdir -p "$BACKUP_DIR/retired-rules"
+    mv "$CLAUDE_HOME/.claude/rules/$retired_rule" "$BACKUP_DIR/retired-rules/"
+  fi
+done
 cp "$REPO_ROOT/rules/"*.md "$CLAUDE_HOME/.claude/rules/" || phase_fail "2" "Failed to copy rules"
 RULE_COUNT=$(ls "$CLAUDE_HOME/.claude/rules/"*.md 2>/dev/null | grep -v README.md | wc -l | tr -d ' ')
 print_ok "$RULE_COUNT rules installed"
@@ -744,8 +755,7 @@ our_mcps = {
     'datadog-mcp': {'type': 'http', 'url': 'https://mcp.ap2.datadoghq.com/api/unstable/mcp-server/mcp?toolsets=core,apm'},
     'context7': {'type': 'stdio', 'command': 'npx', 'args': ['-y', '@upstash/context7-mcp@latest']},
     'probe': {'type': 'stdio', 'command': 'npx', 'args': ['-y', '@probelabs/probe@latest', 'mcp']},
-    'playwright': {'type': 'stdio', 'command': 'npx', 'args': ['@playwright/mcp@latest', '--viewport-size', '1440x900']},
-    'chrome-devtools': {'type': 'stdio', 'command': 'npx', 'args': ['chrome-devtools-mcp@latest']},
+    'chrome-devtools': {'type': 'stdio', 'command': 'npx', 'args': ['chrome-devtools-mcp@1.9.0']},
     'imugi': {'type': 'stdio', 'command': 'npx', 'args': ['-y', 'imugi-ai@latest', 'mcp']}
 }
 
@@ -1224,7 +1234,7 @@ Run a full setup verification. Check each item and report a table with status (P
 3. **Agents**: list files in ~/.claude/agents/, confirm 4 .md files, none contain __PLACEHOLDER__ strings
 4. **Hooks**: list files in ~/.claude/hooks/, confirm .sh files are executable
 5. **Settings**: read ~/.claude/settings.json, confirm valid JSON with keys: hooks, permissions, env
-6. **MCP Servers**: read ~/.claude.json, confirm mcpServers has at minimum: mcp-atlassian, datadog-mcp, context7, probe, playwright, chrome-devtools, imugi (7 base). If local-le-chromadb exists (Local AI enabled), check the python and script paths exist on disk. Report total count
+6. **MCP Servers**: read ~/.claude.json, confirm mcpServers has at minimum: mcp-atlassian, datadog-mcp, context7, probe, chrome-devtools, imugi (6 base). If local-le-chromadb exists (Local AI enabled), check the python and script paths exist on disk. Report total count
 7. **Placeholders**: grep recursively in ~/.claude/rules/, ~/.claude/skills/, ~/.claude/agents/ for any remaining __PLACEHOLDER__ patterns (double underscore prefix+suffix). Report any found
 8. **Vault RAG** (if ~/.claude/local-ai/vault/ exists): confirm vault scripts present (vault_mcp_server.py, vault_index.py, vault_chroma.sh, vault_watch.sh), confirm Python venv at ~/.local/share/le-vault-chroma/venv/bin/python3, check if ChromaDB is running (curl localhost:8100/api/v2/heartbeat), check if Ollama is running and has nomic-embed-text model
 9. **CLI symlinks** (if ~/bin/ has vault-* files): check vault-chroma, vault-index, vault-watch, vault-query exist and point to valid targets

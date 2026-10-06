@@ -28,23 +28,28 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 # --- Platform detection ---
 PLATFORM="unknown"
 SETUP_SCRIPT="setup.sh"
-EXPECTED_MCP_COUNT=8
+EXPECTED_MCP_COUNT=7
 HAS_CHROMADB=1
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "${TEAM_CONFIG_TEST_PLATFORM:-}" == "linux" ]]; then
+  PLATFORM="Linux"
+  SETUP_SCRIPT="setup-wsl.sh"
+  EXPECTED_MCP_COUNT=7
+  HAS_CHROMADB=1
+elif [[ "$OSTYPE" == "darwin"* ]]; then
   PLATFORM="macOS"
   SETUP_SCRIPT="setup.sh"
-  EXPECTED_MCP_COUNT=8
+  EXPECTED_MCP_COUNT=7
   HAS_CHROMADB=1
 elif grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null; then
   PLATFORM="WSL2"
   SETUP_SCRIPT="setup-wsl.sh"
-  EXPECTED_MCP_COUNT=8
+  EXPECTED_MCP_COUNT=7
   HAS_CHROMADB=1
 elif [[ "$OSTYPE" == "linux"* ]]; then
   PLATFORM="Linux"
   SETUP_SCRIPT="setup-wsl.sh"
-  EXPECTED_MCP_COUNT=8
+  EXPECTED_MCP_COUNT=7
   HAS_CHROMADB=1
 fi
 
@@ -176,13 +181,13 @@ header "Rules"
 RULES_DIR="$TEST_HOME/.claude/rules"
 assert_dir "$RULES_DIR" "rules directory exists"
 
-EXPECTED_RULES=("00-global-style.md" "01-code-quality-review.md" "02-skills-first.md" "03-escalation-protocol.md" "04-study-before-starting.md" "05-diagrams-standard.md" "06-worktree-detection.md" "07-agent-model-defaults.md" "08-behavioral-standards.md")
+EXPECTED_RULES=("00-global-style.md" "01-code-quality-review.md" "02-skills-first.md" "03-operational-protocol.md" "04-study-before-starting.md" "05-diagrams-standard.md" "06-worktree-detection.md" "07-agent-model-defaults.md" "08-browser-mcp-terminal-failure.md" "10-session-data-handling.md" "11-output-budget.md" "12-multi-agent-handoff.md" "13-debugging-evidence-first.md" "14-secrets-handling.md" "15-client-context.md" "16-obsidian-vault-writing.md")
 for rule in "${EXPECTED_RULES[@]}"; do
   assert_file "$RULES_DIR/$rule" "rule: $rule"
 done
 
 RULE_COUNT=$(ls "$RULES_DIR/"*.md 2>/dev/null | grep -v "README.md" | wc -l | tr -d ' ')
-assert_count "$RULE_COUNT" 9 "total rules"
+assert_count "$RULE_COUNT" 16 "total rules"
 
 for rule in "${EXPECTED_RULES[@]}"; do
   SIZE=$(wc -c < "$RULES_DIR/$rule" 2>/dev/null | tr -d ' ')
@@ -197,7 +202,7 @@ header "Skills"
 SKILLS_DIR="$TEST_HOME/.claude/skills"
 assert_dir "$SKILLS_DIR" "skills directory exists"
 
-EXPECTED_SKILLS=("capture-knowledge" "codereview" "commit" "create-pr" "daily" "debug-mode" "deploy-checklist" "deslop" "diagrams" "feature-dev" "investigation-case" "learn" "test-scenarios" "thinking-partner" "validate-infra" "validate-migration")
+EXPECTED_SKILLS=("capture-knowledge" "codereview" "commit" "create-pr" "daily" "debug-mode" "deploy-checklist" "deslop" "diagrams" "feature-dev" "investigation-case" "investigation" "handoff" "learn" "test-scenarios" "thinking-partner" "validate-infra" "validate-migration")
 for skill in "${EXPECTED_SKILLS[@]}"; do
   assert_dir "$SKILLS_DIR/$skill" "skill dir: $skill"
   assert_file "$SKILLS_DIR/$skill/SKILL.md" "SKILL.md: $skill"
@@ -207,7 +212,7 @@ SKILL_COUNT=0
 for d in "$SKILLS_DIR"/*/; do
   [ -f "$d/SKILL.md" ] && SKILL_COUNT=$((SKILL_COUNT + 1))
 done
-assert_count "$SKILL_COUNT" 16 "total skills with SKILL.md"
+assert_count "$SKILL_COUNT" 18 "total skills with SKILL.md"
 
 # ============================================================================
 # Test 3b: Path Placeholders Resolved
@@ -308,7 +313,7 @@ assert_file "$MCP_FILE" ".claude.json exists"
 python3 -c "import json; json.load(open('$MCP_FILE'))" 2>/dev/null && pass "valid JSON" || fail "invalid JSON"
 
 # Common MCPs (all platforms)
-COMMON_MCPS=("mcp-atlassian" "datadog-mcp" "context7" "probe" "playwright" "chrome-devtools" "imugi")
+COMMON_MCPS=("mcp-atlassian" "datadog-mcp" "context7" "probe" "chrome-devtools" "imugi")
 for mcp in "${COMMON_MCPS[@]}"; do
   assert_json_key "$MCP_FILE" "'$mcp' in d.get('mcpServers',{})" "MCP: $mcp"
 done
@@ -374,7 +379,7 @@ else
   fail "learnings.md deleted"
 fi
 
-echo "$RERUN_OUTPUT" | grep -q "settings.json preserved" && pass "settings.json not overwritten" || fail "settings.json was overwritten"
+echo "$RERUN_OUTPUT" | grep -qE "settings.json (preserved|merged)" && pass "settings.json not overwritten" || fail "settings.json was overwritten"
 
 # MCP config is merged (not replaced), so backup is not created by setup.sh
 # The backup dir from the general backup phase covers rollback
@@ -426,7 +431,7 @@ header "Summary Output"
 run_with_spinner "Running (final output check)..." bash "$REPO_ROOT/scripts/$SETUP_SCRIPT"
 FINAL_OUTPUT="$SPINNER_OUTPUT"
 
-echo "$FINAL_OUTPUT" | grep -q "9 rules" && pass "summary: 9 rules" || fail "summary missing 9 rules"
+echo "$FINAL_OUTPUT" | grep -q "16 rules" && pass "summary: 16 rules" || fail "summary missing 16 rules"
 echo "$FINAL_OUTPUT" | grep -qE "1[5-8] skills" && pass "summary: skills count present" || fail "summary missing skills count"
 echo "$FINAL_OUTPUT" | grep -q "4 agents" && pass "summary: 4 agents" || fail "summary missing 4 agents"
 echo "$FINAL_OUTPUT" | grep -q "$EXPECTED_MCP_COUNT MCP" && pass "summary: $EXPECTED_MCP_COUNT MCP servers" || fail "summary missing $EXPECTED_MCP_COUNT MCP"

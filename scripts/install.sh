@@ -27,7 +27,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   PLATFORM="linux"
 else
   echo -e "${RED}Unsupported platform: $OSTYPE${NC}"
-  echo "Run setup manually: bash scripts/setup.sh (macOS) or bash scripts/setup-wsl.sh (Linux/WSL2)"
+  echo "Run setup manually: bash scripts/setup.sh "$@" (macOS) or bash scripts/setup-wsl.sh "$@" (Linux/WSL2)"
   exit 1
 fi
 
@@ -35,24 +35,30 @@ echo -e "${CYAN}Platform: ${BOLD}$PLATFORM${NC}"
 echo ""
 
 # Clone repo to standard location
-REPO_DIR="$HOME/Documents/LuxuryEscapes/team-exp-claude-config"
+REPO_DIR="${TEAM_CONFIG_DIR:-$HOME/Documents/team-exp-claude-config}"
+CONFIG_REF="${TEAM_CONFIG_REF:-main}"
 mkdir -p "$(dirname "$REPO_DIR")"
 
 if [ -d "$REPO_DIR/.git" ]; then
   echo "Updating existing config..."
-  cd "$REPO_DIR" && git pull origin main 2>/dev/null
+  cd "$REPO_DIR"
+  if [ "$(git branch --show-current)" != "$CONFIG_REF" ]; then
+    echo "Existing checkout is on another branch. Use a separate TEAM_CONFIG_DIR."
+    exit 1
+  fi
+  git pull --ff-only origin "$CONFIG_REF"
 else
   echo "Cloning team config..."
-  git clone git@github.com:ivanhoinacki/team-exp-claude-config.git "$REPO_DIR" 2>/dev/null || \
-  git clone https://github.com/ivanhoinacki/team-exp-claude-config.git "$REPO_DIR"
+  git clone --branch "$CONFIG_REF" git@github.com:ivanhoinacki/team-exp-claude-config.git "$REPO_DIR" 2>/dev/null || \
+  git clone --branch "$CONFIG_REF" https://github.com/ivanhoinacki/team-exp-claude-config.git "$REPO_DIR"
 fi
 
 # Run platform-specific setup
 cd "$REPO_DIR"
 if [ "$PLATFORM" = "macos" ]; then
-  bash scripts/setup.sh
+  bash scripts/setup.sh "$@"
 else
-  bash scripts/setup-wsl.sh
+  bash scripts/setup-wsl.sh "$@"
 fi
 
 echo -e "${GREEN}${BOLD}Done!${NC}"

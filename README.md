@@ -1,158 +1,54 @@
 # team-exp-claude-config
 
-AI Dev ecosystem for engineering teams. One-command setup that installs rules, skills, agents, hooks, MCP servers, and service dossiers. Works with Claude Code and Cursor.
+Reusable Claude Code instructions for a company machine. This temporary branch updates
+the configuration without creating a tag or release.
 
-## Install
-
-```bash
-# macOS
-curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/v1.1.0/scripts/install.sh | bash
-
-# Linux / WSL2
-curl -sSL https://raw.githubusercontent.com/ivanhoinacki/team-exp-claude-config/v1.1.0/scripts/install.sh | bash
-```
-
-> The installer detects your platform and runs the correct setup script.
-
-## What you get
-
-| Component | Count | Purpose |
-|---|---|---|
-| **Rules** | 9 | Behavioral guardrails (auto-loaded every conversation) |
-| **Skills** | 16 | Automated workflows: `/commit`, `/create-pr`, `/feature-dev`, `/investigation-case`, etc. |
-| **Agents** | 4 | Specialized sub-agents: Copilot, Researcher, Implementer, Reviewer |
-| **Hooks** | 25 | Lifecycle automation: pre-commit checks, skill enforcement, db-tunnel guard, session-end-save, context, logging |
-| **Service Dossiers** | 9 | CLAUDE.md per repo (stack, commands, patterns, gotchas) |
-| **MCP Servers** | 8 | Atlassian, Datadog, ChromaDB/vault-rag, Context7, Probe, Playwright, Chrome DevTools, Imugi |
-| **Scripts** | 2 | plantuml_encode.py (diagram URLs), ci-local-check.sh (local CI) |
-
-## Quick start (manual clone)
+## Download and install the temporary branch
 
 ```bash
-cd ~/Documents/LuxuryEscapes
-git clone git@github.com:ivanhoinacki/team-exp-claude-config.git
+git clone --branch transfer/company-config-20261005 --single-branch https://github.com/ivanhoinacki/team-exp-claude-config.git
 cd team-exp-claude-config
-
-bash scripts/setup.sh        # macOS
-bash scripts/setup-wsl.sh    # Linux / WSL2
+python3 scripts/install-config.py
+python3 scripts/install-config.py --verify
 ```
 
-## Post-setup
+The recommended portable install includes **16 rules, 8 active skills and 4 agents**.
+It backs up changed files, archives superseded package rules, preserves personal
+learnings and leaves settings, MCPs, credentials and dependencies unchanged.
+
+Paths can be supplied with `--codebase-root`, `--vault-root` and `--user-name`.
+Existing `.team-config.json` values are reused when available. See
+[company machine instructions](docs/COMPANY-MACHINE.md) for examples and rollback.
+
+## Current workflows
+
+`commit`, `create-pr`, `deslop`, `feature-dev`, `codereview`, `thinking-partner`,
+`investigation`, and optional project-configured `handoff`.
+
+The older 16 workflows remain in the repository for compatibility, making 18 skill
+directories in total. `investigation-case` delegates to the current investigation
+workflow. The portable installer installs the 8 current workflows only.
+
+## Full historical setup
+
+`bash scripts/setup.sh` (macOS) and `bash scripts/setup-wsl.sh` (Linux/WSL) retain
+the original team-specific hooks, service dossiers and integrations. Use them only
+for that environment. `--config-only` selects the portable installation instead.
+The full setup does not add generic Playwright MCP; Chrome DevTools is the browser default.
+Existing MCP entries are preserved rather than removed.
+
+## Update and validate
 
 ```bash
-claude                     # open Claude Code
-/mcp                       # connect Datadog (needs VPN) + Slack (OAuth)
+bash scripts/update.sh --config-only
+python3 -m unittest discover -s tests -v
+bash scripts/test-setup.sh
 ```
 
-### Verify
-
-```bash
-claude mcp list            # 8 MCPs
-ls ~/.claude/rules/        # 9 files
-ls ~/.claude/skills/       # 16+ directories
-ls ~/.claude/agents/       # 4 files
-```
-
-## Structure
-
-```
-team-exp-claude-config/
-  rules/                   # 8 behavioral rules (auto-loaded)
-    00-global-style.md
-    01-code-quality-review.md
-    02-skills-first.md
-    03-escalation-protocol.md
-    04-study-before-starting.md
-    05-diagrams-standard.md
-    06-worktree-detection.md
-    07-agent-model-defaults.md
-    08-behavioral-standards.md
-  skills/                  # 16 slash command workflows
-    commit/                #   /commit - format enforced
-    create-pr/             #   /create-pr - template + diagrams
-    feature-dev/           #   /feature-dev - 6 phases
-    codereview/            #   /codereview - 18 dimensions
-    investigation-case/    #   /investigation-case - 7 parallel agents
-    debug-mode/            #   /debug-mode - hypothesis-driven
-    deslop/                #   /deslop - clean AI-generated code
-    daily/                 #   /daily - standup notes
-    learn/                 #   /learn - capture knowledge
-    thinking-partner/      #   /thinking-partner - critical analysis
-    validate-infra/        #   /validate-infra - env var audit
-    validate-migration/    #   /validate-migration - rollback check
-    deploy-checklist/      #   /deploy-checklist - risk-based
-    test-scenarios/        #   /test-scenarios - real validation
-    diagrams/              #   /diagrams - PlantUML standard
-    capture-knowledge/     #   /capture-knowledge - Slack to vault
-  agents/                  # 4 specialized sub-agents
-    copilot.md             #   Opus, daily partner
-    researcher.md          #   Sonnet, read-only discovery
-    implementer.md         #   Opus, code implementation
-    reviewer.md            #   Opus, read-only review
-  hooks/                   # 25 lifecycle hooks (all installed)
-    pre-git-commit.sh
-    skill-enforcement-guard.sh
-    tool-preference-guard.sh
-    db-tunnel-guard.sh
-    agent-model-guard.sh
-    session-end-save.sh
-    skill-tracker.sh
-    session-start-check.sh
-    vault-rag-reminder.sh
-    frontend-layout-guard.sh
-    worktree-setup.sh
-    ...
-  claude-md/               # 9 service dossiers (CLAUDE.md templates)
-    svc-experiences.md
-    svc-order.md
-    www-le-admin.md
-    ...
-  scripts/                 # Setup and maintenance
-    install.sh             #   One-line curl installer (auto-detects platform)
-    setup.sh               #   macOS installer
-    setup-wsl.sh           #   Linux/WSL2 installer
-    update.sh              #   Update existing installation
-    verify-setup.sh        #   Verify installation
-    test-setup.sh          #   Test suite
-    ci-local-check.sh      #   Run CI checks locally
-```
-
-## Cursor IDE integration
-
-The setup syncs rules and MCP servers to Cursor automatically (Phase 10, opt-in):
-
-| Feature | Claude Code | Cursor | Shared? |
-|---|---|---|---|
-| Rules (9) | `~/.claude/rules/*.md` | `~/.cursor/rules/*.mdc` | Yes, auto-synced |
-| MCP Servers (8) | `~/.claude/claude.json` | `~/.cursor/mcp.json` | Yes, auto-synced |
-| Skills (16) | `~/.claude/skills/` | Not supported | Claude Code only |
-| Hooks | `settings.json` | Not supported | Claude Code only |
-| Agents (4) | `~/.claude/agents/` | Not supported | Claude Code only |
-| CLAUDE.md | Repo root | Repo root | Yes, same file |
-
-## Customization
-
-Fork this repo and adapt for your team:
-
-1. Edit rules for your domain and coding standards
-2. Create skills for your recurring workflows
-3. Write CLAUDE.md dossiers for your repos
-4. Add pitfalls as you discover bugs and gotchas
-
-## Pre-requisites
-
-- Claude Code CLI (`npm install -g @anthropic-ai/claude-code`)
-- Node.js 20+ (via nvm)
-- Git + GitHub CLI (`gh auth login`)
-- Atlassian API token
-- Python 3 (for vault-rag)
+The update follows the checked-out branch. ZIP downloads can rerun install-config.py
+without Git. No private settings, tokens, memory, client contexts or local knowledge
+histories were exported into this branch. Hooks and MCPs are not installed by the portable mode.
 
 ## Workshops
 
-Engineering team workshops delivered by Ivan Hoinacki. Live slides auto-deployed on every push to `main`.
-
-| # | Title | Date | Links |
-| --- | --- | --- | --- |
-| 02 | Claude Code Ecosystem | Apr 2026 | [live slides](https://ivanhoinacki.github.io/team-exp-claude-config/workshop-02/) · [PDF](https://ivanhoinacki.github.io/team-exp-claude-config/workshop-02.pdf) · [source](./workshops/workshop-02/) |
-
-See [`workshops/`](./workshops/) for all decks.
+The existing [workshops](workshops/) and their main-branch publication remain unchanged.

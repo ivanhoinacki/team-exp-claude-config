@@ -35,6 +35,11 @@ VERSION_FILE="$CLAUDE_HOME/.claude/.team-config-version"
 BACKUP_DIR="$CLAUDE_HOME/.claude/.setup-backup-$(date +%Y%m%d-%H%M%S)"
 REPO_VERSION=$(git -C "$REPO_ROOT" describe --tags --always 2>/dev/null || echo "dev")
 
+# Portable instruction-only installation, without MCPs, credentials or dependencies.
+if [[ " ${*} " == *" --config-only "* ]]; then
+  exec python3 "$SCRIPT_DIR/install-config.py" --target-home "$CLAUDE_HOME"
+fi
+
 # --- Parse flags ---
 RECONFIGURE=false
 FORCE=false
@@ -399,7 +404,7 @@ if [ "$SETUP_TEST_MODE" != "1" ] && [ "$IS_UPDATE" = "false" ]; then
   echo "    Name:          $USER_FULL_NAME"
   echo "    Email:         $USER_EMAIL"
   echo "    Slack ID:      $SLACK_USER_ID"
-  echo "    Token:         ${ATLASSIAN_TOKEN:0:8}..."
+  echo "    Token:         ${#ATLASSIAN_TOKEN} characters (value hidden)"
   echo "    Codebase:      $CODEBASE_ROOT"
   echo "    Vault:         $VAULT_ROOT"
   echo "    Slack DM:      $SLACK_DM_ID"
@@ -455,6 +460,12 @@ phase_ok "2-info"
 # --- Phase 3: Rules ---
 print_header "Phase 3: Rules"
 mkdir -p "$CLAUDE_HOME/.claude/rules"
+for retired_rule in 03-escalation-protocol.md 08-behavioral-standards.md; do
+  if [ -f "$CLAUDE_HOME/.claude/rules/$retired_rule" ]; then
+    mkdir -p "$BACKUP_DIR/retired-rules"
+    mv "$CLAUDE_HOME/.claude/rules/$retired_rule" "$BACKUP_DIR/retired-rules/"
+  fi
+done
 
 RULE_COUNT=0
 for rule_file in "$REPO_ROOT/rules/"*.md; do
@@ -605,6 +616,9 @@ done
 chmod +x "$CLAUDE_HOME/.claude/hooks/"*.sh 2>/dev/null || true
 chmod +x "$CLAUDE_HOME/.claude/statusline-command.sh" 2>/dev/null || true
 print_ok "$HOOK_COUNT hooks + status line installed"
+mkdir -p "$CLAUDE_HOME/.claude/scripts"
+cp "$REPO_ROOT/scripts/plantuml_encode.py" "$CLAUDE_HOME/.claude/scripts/"
+chmod +x "$CLAUDE_HOME/.claude/scripts/plantuml_encode.py"
 phase_ok "6-hooks"
 
 # --- Phase 7: Settings ---
@@ -627,16 +641,13 @@ SETTINGS_TEMPLATE=$(cat << 'EOF'
   },
   "hooks": {
     "PreToolUse": [
-      {"matcher":"Bash","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-enforcement-guard.sh","timeout":5,"statusMessage":"Checking skill enforcement..."},{"type":"command","command":"$HOME/.claude/hooks/tool-preference-guard.sh","timeout":3}]},
-      {"matcher":"Bash(git commit)","hooks":[{"type":"command","command":"$HOME/.claude/hooks/pre-git-commit.sh","timeout":120,"statusMessage":"Running pre-commit checks (lint + types)..."}]}
+      {"matcher":"Bash","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-enforcement-guard.sh","timeout":5,"statusMessage":"Checking skill enforcement..."},{"type":"command","command":"$HOME/.claude/hooks/tool-preference-guard.sh","timeout":3},{"type":"command","command":"$HOME/.claude/hooks/db-tunnel-guard.sh","timeout":3,"statusMessage":"Checking DB access method..."}]},
+      {"matcher":"Bash(git commit)","hooks":[{"type":"command","command":"$HOME/.claude/hooks/pre-git-commit.sh","timeout":120,"statusMessage":"Running pre-commit checks (lint + types)..."}]},
+      {"matcher":"Agent","hooks":[{"type":"command","command":"$HOME/.claude/hooks/agent-model-guard.sh","timeout":3,"statusMessage":"Validating Agent model parameter..."}]}
     ],
     "PostToolUse": [{"matcher":"Skill","hooks":[{"type":"command","command":"$HOME/.claude/hooks/skill-tracker.sh","timeout":3}]}],
     "SessionStart": [{"matcher":"startup|resume","hooks":[{"type":"command","command":"~/.claude/hooks/session-start-check.sh","timeout":10}]}],
     "Notification": [{"matcher":"","hooks":[{"type":"command","command":"printf '\\a' > /dev/tty"}]}]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
   },
   "language": "English",
   "effortLevel": "medium",
@@ -732,8 +743,7 @@ our_mcps = {
     'datadog-mcp': {'type': 'http', 'url': 'https://mcp.ap2.datadoghq.com/api/unstable/mcp-server/mcp?toolsets=core,apm'},
     'context7': {'type': 'stdio', 'command': 'npx', 'args': ['-y', '@upstash/context7-mcp@latest']},
     'probe': {'type': 'stdio', 'command': 'npx', 'args': ['-y', '@probelabs/probe@latest', 'mcp']},
-    'playwright': {'command': 'npx', 'args': ['@playwright/mcp@latest', '--viewport-size', '1440x900']},
-    'chrome-devtools': {'command': 'npx', 'args': ['chrome-devtools-mcp@latest']},
+    'chrome-devtools': {'command': 'npx', 'args': ['chrome-devtools-mcp@1.9.0']},
     'imugi': {'command': 'npx', 'args': ['-y', 'imugi-ai@latest', 'mcp']}
 }
 
@@ -1222,7 +1232,7 @@ Run a full setup verification. Check each item and report a table with status (P
 3. **Agents**: list files in ~/.claude/agents/, confirm 4 .md files, none contain __PLACEHOLDER__ strings
 4. **Hooks**: list files in ~/.claude/hooks/, confirm 22 .sh files are executable, confirm ~/.claude/statusline-command.sh exists
 5. **Settings**: read ~/.claude/settings.json, confirm valid JSON with keys: hooks, statusLine, permissions, env
-6. **MCP Servers**: read ~/.claude.json, confirm mcpServers has at minimum: mcp-atlassian, datadog-mcp, context7, probe, playwright, chrome-devtools, imugi (7 base). If local-le-chromadb exists (Local AI enabled), check the python and script paths exist on disk. Report total count
+6. **MCP Servers**: read ~/.claude.json, confirm mcpServers has at minimum: mcp-atlassian, datadog-mcp, context7, probe, chrome-devtools, imugi (6 base). If local-le-chromadb exists (Local AI enabled), check the python and script paths exist on disk. Report total count
 7. **Placeholders**: grep recursively in ~/.claude/rules/, ~/.claude/skills/, ~/.claude/agents/ for any remaining __PLACEHOLDER__ patterns (double underscore prefix+suffix). Report any found
 8. **Vault RAG** (if ~/.claude/local-ai/vault/ exists): confirm vault scripts present (vault_mcp_server.py, vault_index.py, vault_chroma.sh, vault_watch.sh), confirm Python venv at ~/.local/share/le-vault-chroma/venv/bin/python3, check if ChromaDB is running (curl localhost:8100/api/v2/heartbeat), check if Ollama is running and has nomic-embed-text model
 9. **CLI symlinks** (if ~/bin/ has vault-* files): check vault-chroma, vault-index, vault-watch, vault-query exist and point to valid targets

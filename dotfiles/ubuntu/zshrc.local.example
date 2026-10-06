@@ -1,0 +1,14 @@
+# Copy to ~/.zshrc.local and fill in on this machine only. Never commit the real file.
+# Tokens: prefer a secret store (pass, gnome-keyring via secret-tool) over plain text:
+#   export NPM_TOKEN="$(secret-tool lookup service npm account default)"
+#   export NOTION_TOKEN="$(secret-tool lookup service notion account default)"
+
+# Company work root (example)
+# export WORK_ROOT="$HOME/work"
+# alias work='cd "$WORK_ROOT"'
+
+# Notes folder, if any
+# export NOTES_DIR="$HOME/Documents/Notes"
+
+# Node memory for big builds (the Mac used 10240 on 36 GB of RAM; scale to this machine)
+# export NODE_OPTIONS="--max-old-space-size=4096"

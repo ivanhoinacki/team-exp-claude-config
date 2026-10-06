@@ -20,6 +20,22 @@ Paths can be supplied with `--codebase-root`, `--vault-root` and `--user-name`.
 Existing `.team-config.json` values are reused when available. See
 [company machine instructions](docs/COMPANY-MACHINE.md) for examples and rollback.
 
+## Ubuntu workstation configuration
+
+The portable shell is in `dotfiles/ubuntu/zshrc`. To install its dependencies and
+copy the shell, tmux, Ghostty and Git/delta configuration with backups:
+
+```bash
+bash dotfiles/ubuntu/bootstrap.sh
+bash dotfiles/ubuntu/bootstrap.sh --verify
+zsh
+```
+
+Use `--node` to install Node LTS, or `--config-only` to copy files without packages.
+The script preserves `~/.zshrc.local`, Git identity and existing plugin repositories.
+Fonts and Ghostty are installed separately. See [Ubuntu setup](docs/UBUNTU-SETUP.md)
+and [validation and limits](docs/UBUNTU-HANDOFF.md).
+
 ## Current workflows
 
 `commit`, `create-pr`, `deslop`, `feature-dev`, `codereview`, `thinking-partner`,

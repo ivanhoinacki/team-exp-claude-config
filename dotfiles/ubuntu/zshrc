@@ -1,0 +1,191 @@
+# Portable zsh config for Ubuntu, derived from the macOS setup.
+# Machine-specific values (tokens, paths, work aliases) go in ~/.zshrc.local,
+# which this file sources at the end. Tools are installed by bootstrap.sh.
+
+# ---------------------------------------------------------------- oh-my-zsh
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="spaceship"
+SPACESHIP_PROMPT_ASYNC=false
+plugins=(git)
+
+# Spaceship reads these when the theme loads, so they must come before oh-my-zsh.sh.
+SPACESHIP_PROMPT_ORDER=(
+  user dir host git exec_time line_sep jobs exit_code char
+)
+SPACESHIP_USER_SHOW=always
+SPACESHIP_PROMPT_ADD_NEWLINE=false
+SPACESHIP_CHAR_SYMBOL="❯"
+SPACESHIP_CHAR_SUFFIX=" "
+
+[[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
+
+# ---------------------------------------------------------------- history
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS
+
+# ---------------------------------------------------------------- zinit plugins
+ZINIT_HOME="$HOME/.local/share/zinit/zinit.git"
+if [[ ! -f "$ZINIT_HOME/zinit.zsh" ]]; then
+  mkdir -p "${ZINIT_HOME:h}" && git clone https://github.com/zdharma-continuum/zinit "$ZINIT_HOME"
+fi
+[[ -f "$ZINIT_HOME/zinit.zsh" ]] && source "$ZINIT_HOME/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+ZSH_AUTOSUGGEST_STRATEGY=(completion history)
+(( $+functions[zinit] )) && {
+zinit light spaceship-prompt/spaceship-vi-mode
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
+zinit light zdharma-continuum/fast-syntax-highlighting
+}
+# vi_mode only exists after spaceship-vi-mode loads; adding it to the order earlier warns.
+(( $+functions[spaceship] )) && spaceship add --before char vi_mode 2>/dev/null
+
+# ---------------------------------------------------------------- PATH
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+# ---------------------------------------------------------------- node (lazy nvm)
+export NVM_DIR="$HOME/.nvm"
+if [[ -r "$NVM_DIR/alias/default" ]]; then
+  nvm_default_version="${$(<"$NVM_DIR/alias/default")%%[[:space:]]*}"
+  [[ "$nvm_default_version" != v* ]] && nvm_default_version="v${nvm_default_version}.*"
+  nvm_default_bins=("$NVM_DIR"/versions/node/$~nvm_default_version/bin(N))
+  (( ${#nvm_default_bins} )) && export PATH="${nvm_default_bins[-1]}:$PATH"
+  unset nvm_default_version nvm_default_bins
+fi
+nvm() {
+  unset -f nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
+
+# ---------------------------------------------------------------- completion and keys
+if [[ -t 0 && -o interactive && -o zle ]]; then
+  # fzf >= 0.48 ships 'fzf --zsh'; older apt packages only have the example scripts.
+  if command -v fzf >/dev/null && fzf --zsh >/dev/null 2>&1; then
+    source <(fzf --zsh)
+  else
+    [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+    [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
+  fi
+  zmodload -i zsh/complist
+  setopt AUTO_LIST AUTO_MENU COMPLETE_IN_WORD LIST_AMBIGUOUS
+  unsetopt MENU_COMPLETE
+  zstyle ':completion:*' menu select=1
+  zstyle ':completion:*' force-list always
+  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*'
+  zstyle ':completion:*' squeeze-slashes true
+  [[ -n "${LS_COLORS:-}" ]] && zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+  bindkey '^I' complete-word
+  bindkey '^[b' backward-word
+  bindkey '^[f' forward-word
+  bindkey '^[[1;5D' backward-word
+  bindkey '^[[1;5C' forward-word
+  bindkey '^[[H' beginning-of-line
+  bindkey '^[[F' end-of-line
+  bindkey '^H' backward-kill-word
+fi
+
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+
+# ---------------------------------------------------------------- Ubuntu names
+# apt ships bat as batcat and fd as fdfind; expose the usual names.
+command -v batcat >/dev/null && ! command -v bat >/dev/null && alias bat=batcat
+command -v fdfind >/dev/null && ! command -v fd >/dev/null && alias fd=fdfind
+
+# Clipboard: pbcopy/pbpaste on Linux, by the session actually running.
+if ! command -v pbpaste >/dev/null; then
+  if [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-paste >/dev/null; then
+    alias pbcopy='wl-copy'; alias pbpaste='wl-paste --no-newline'
+  elif [[ -n "${DISPLAY:-}" ]] && command -v xclip >/dev/null; then
+    alias pbcopy='xclip -selection clipboard'; alias pbpaste='xclip -selection clipboard -o'
+  fi
+fi
+
+# ---------------------------------------------------------------- modern CLI aliases
+command -v eza >/dev/null && {
+  alias ls="eza --icons --group-directories-first"
+  alias ll="eza -la --icons --group-directories-first --git"
+  alias lt="eza --tree --level=2 --icons"
+}
+{ command -v bat >/dev/null || command -v batcat >/dev/null; } && alias cat="bat --paging=never"
+command -v dust  >/dev/null && alias du="dust"
+command -v duf   >/dev/null && alias df="duf"
+command -v gping >/dev/null && alias ping="gping"
+command -v delta >/dev/null && alias diff="delta"
+command -v lazygit    >/dev/null && alias lg="lazygit"
+command -v lazydocker >/dev/null && alias lzd="lazydocker"
+
+# Claude Code launched from inside another session must not inherit its marker.
+alias claude='env -u CLAUDECODE claude'
+
+# ---------------------------------------------------------------- git
+alias gs="git status"
+alias gd="git diff"
+alias gl="git log --oneline -20"
+alias gp="git pull"
+
+# ---------------------------------------------------------------- ports and processes
+kp() {
+  [ -z "$1" ] && { echo "Usage: kp <port>"; return 1; }
+  local pids; pids=$(lsof -ti :"$1" 2>/dev/null)
+  if [ -n "$pids" ]; then echo "$pids" | xargs kill -9; echo "Killed process(es) on port $1: $pids"
+  else echo "Port $1 is not in use"; fi
+}
+wp() { [ -z "$1" ] && { echo "Usage: wp <port>"; return 1; }; lsof -i :"$1" -P -n 2>/dev/null || echo "Port $1 is not in use"; }
+ports() {
+  echo "=== Active dev ports ==="
+  ss -ltnp 2>/dev/null | awk 'NR>1 {print $4, $6}' | grep -E ':(3|4|5|8|9)[0-9]{3} ' | sort -u
+}
+alias topmem="ps aux --sort=-%mem | head -10"
+alias topcpu="ps aux --sort=-%cpu | head -10"
+alias mem="free -h"
+alias swap="swapon --show"
+
+# ---------------------------------------------------------------- dev helpers (clipboard based)
+jsonf() { pbpaste | jq . 2>/dev/null || echo "Clipboard does not contain valid JSON"; }
+jwtd()  { pbpaste | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null || echo "Clipboard does not contain a valid JWT"; }
+jwta() {
+  local token; token=$(pbpaste)
+  echo "=== Header ===";  echo "$token" | jq -R 'split(".") | .[0] | @base64d | fromjson' 2>/dev/null
+  echo "\n=== Payload ==="; echo "$token" | jq -R 'split(".") | .[1] | @base64d | fromjson' 2>/dev/null
+}
+ts()   { if [ -z "$1" ]; then echo "Now: $(date +%s) ($(date))"; else date -d "@$1" 2>/dev/null || echo "Invalid timestamp: $1"; fi; }
+uuid() { command cat /proc/sys/kernel/random/uuid; }
+b64e() { pbpaste | base64; }
+b64d() { pbpaste | base64 -d; }
+urle() { python3 -c "import sys,urllib.parse;print(urllib.parse.quote(sys.stdin.read().strip()))" <<< "$(pbpaste)"; }
+urld() { python3 -c "import sys,urllib.parse;print(urllib.parse.unquote(sys.stdin.read().strip()))" <<< "$(pbpaste)"; }
+status() { curl -s -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" "$1"; }
+big()  { dust -n "${1:-20}" 2>/dev/null || du -sh * | sort -rh | head -"${1:-20}"; }
+
+# ---------------------------------------------------------------- docker
+dlogs() { docker logs -f --tail "${2:-100}" "$1"; }
+dsh()   { docker exec -it "$1" /bin/sh; }
+dps()   { docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "Docker not running"; }
+flushdns() { sudo resolvectl flush-caches && echo "DNS cache flushed"; }
+rlocal() { local port="${1:-6379}"; if command -v iredis >/dev/null; then iredis -h 127.0.0.1 -p "$port"; else redis-cli -h 127.0.0.1 -p "$port"; fi; }
+
+# ---------------------------------------------------------------- local LLM (optional, Ollama)
+export OLLAMA_PORT="${OLLAMA_PORT:-11434}"
+export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3-coder:30b}"
+ask() {
+  curl -s "http://localhost:${OLLAMA_PORT}/api/tags" >/dev/null 2>&1 || { echo "Ollama not running (systemctl --user start ollama or ollama serve)"; return 1; }
+  local input=""; [ -p /dev/stdin ] && input=$(command cat)
+  local prompt="${input:+$input\n\n}$*"
+  curl -s "http://localhost:${OLLAMA_PORT}/v1/chat/completions" \
+    -H 'Content-Type: application/json' \
+    -d "$(jq -n --arg m "$OLLAMA_MODEL" --arg p "$prompt" '{model:$m,messages:[{role:"user",content:$p}]}')" \
+    | jq -r '.choices[0].message.content'
+}
+lmodel() { export OLLAMA_MODEL="$1"; echo "Default model: $1"; }
+alias oll="curl -s localhost:${OLLAMA_PORT}/api/ps | jq"
+alias oll-tags="curl -s localhost:${OLLAMA_PORT}/api/tags | jq '.models[] | {name, size}'"
+
+# ---------------------------------------------------------------- machine-local overrides
+# Tokens, company aliases and paths live here, never in this file.
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

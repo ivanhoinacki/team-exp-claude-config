@@ -1,0 +1,9 @@
+# GitHub repository | destination relative to home | observed commit
+https://github.com/ohmyzsh/ohmyzsh.git|.oh-my-zsh|83a0ec79ee3b1f64c6ae2e80dcb1fb27a55e5952
+https://github.com/spaceship-prompt/spaceship-prompt.git|.oh-my-zsh/custom/themes/spaceship-prompt|04bfd78098b6bb2720c6ea4c7288833a5aaa099b
+https://github.com/zdharma-continuum/zinit.git|.local/share/zinit/zinit.git|701657f71b7e61a43facddf85a5cfba728f1967a
+https://github.com/zsh-users/zsh-autosuggestions.git|.local/share/zinit/plugins/zsh-users---zsh-autosuggestions|85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5
+https://github.com/zsh-users/zsh-completions.git|.local/share/zinit/plugins/zsh-users---zsh-completions|989d0445450b8e79b3cde2da3b7f4bb54934354c
+https://github.com/zdharma-continuum/fast-syntax-highlighting.git|.local/share/zinit/plugins/zdharma-continuum---fast-syntax-highlighting|4672ad5dd9ad68a7effc1476d65afb7c584ce2b3
+https://github.com/spaceship-prompt/spaceship-vi-mode.git|.local/share/zinit/plugins/spaceship-prompt---spaceship-vi-mode|31a5ac45eb9dcb84b968e1515e8a0074dbc4d1a8
+https://github.com/nvm-sh/nvm.git|.nvm|179d45050be0a71fd57591b0ed8aedf9b177ba10
